@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>test</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+
+    <link rel="stylesheet" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+    
+    <style>
+      html, body, #map { height: 100%; margin: 0; padding: 0; }
+    </style>
+
+    <script type="text/javascript">
+      var dojoConfig = {
+        parseOnLoad: true, 
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "localhost" 
+      };
+    </script>
+
+    <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+
+    <script>
+        var map;
+        require(["esri/map", "esri/layers/ArcGISTiledMapServiceLayer",
+                "esri/config","dojo/domReady!"], 
+            function(Map,ArcGISTiledMapServiceLayer,esriConfig){
+                map = new Map("map",{
+                    center: [114.36,30.36],
+                    zoom: 8,
+                    basemap: "jiangxia",
+                    slider:true, nav:true
+                });
+
+                // var myMap = new Map("map");
+          // var myTiledMapServiceLayer = ArcGISTiledMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/TaxParcel/AssessorsBasemap/MapServer");  
+          // myMap.addLayer(myTiledMapServiceLayer);  
+
+
+          // //configure map animation to be faster
+          // esriConfig.defaults.map.panDuration = 1; // time in milliseconds, default panDuration: 350
+          // esriConfig.defaults.map.panRate = 1; // default panRate: 25
+          // esriConfig.defaults.map.zoomDuration = 100; // default zoomDuration: 500
+          // esriConfig.defaults.map.zoomRate = 1; // default zoomRate: 25
+
+        });
+
+
+      
+          
+
+      /*dojo.require("esri.map"); 
+      function init() {   
+          var myMap = new esri.Map("map");
+          var myTiledMapServiceLayer = new 
+          esri.layers.ArcGISTiledMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/TaxParcel/AssessorsBasemap/MapServer");  
+          myMap.addLayer(myTiledMapServiceLayer);  
+      } 
+      dojo.addOnLoad(init);*/
+
+     /* var map;
+      require(["esri/map","esri/SpatialReference",
+               "esri/layers/ArcGISTiledMapServiceLayer","esri/geometry/Extent"
+               "dojo/domReady"
+              ],function(
+                Map,SpatialReference,ArcGISTiledMapServiceLayer,Extent
+              ){
+                var initialExtent = new Extent(510459, 373483, 548787, 398445);
+                map = Map("map",{extent:initialExtent,spatialReference:{wkid:2435}});
+                //map.spatialReference = new SpatialReference({wkid:2435});
+                var tiledMapServer = new ArcGISTiledMapServiceLayer("http://192.168.100.230:6080/arcgis/rest/services/JCDT/wh_xzq/MapServer");
+                map.addLayer(tiledMapServer);
+      });*/
+
+    </script>
+
+
+</head>
+
+
+
+<body>
+    <div id="map"></div>
+</body>
+
+</html>

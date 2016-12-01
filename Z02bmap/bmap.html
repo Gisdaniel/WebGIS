@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>百度地图示例</title>
+<style type="text/css"> 
+
+    body, html{margin:0;padding:0; width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+    #map{height:100%;width:100%;}
+    #r-result{width:100%; font-size:14px;line-height:20px;}
+
+</style> 
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script> 
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=E7674a70c73761474b47c1b2add1add4"></script> 
+<script type="text/javascript" src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script> 
+<script> 
+    $(function(){ 
+        //navigator.geolocation.getCurrentPosition(translatePoint); //定位 
+        //判断手机浏览器是否支持定位
+        if(navigator.geolocation){
+            var geolocation = new BMap.Geolocation();//创建定位实例
+            geolocation.getCurrentPosition(translatePoint,{enableHighAccuracy: true});//enableHighAccuracy 要求浏览器获取最佳结果
+        }else{
+            //map.addControl(new BMap.GeolocationControl());//添加定位控件 支持定位
+        }
+
+    }); 
+    function translatePoint(position){ 
+        /*var currentLat = position.latitude; 
+        var currentLon = position.longitude; 
+        var gpsPoint = new BMap.Point(currentLon, currentLat); 
+        BMap.Convertor.translate(gpsPoint, 0, initMap); //转换坐标 */
+
+        if(this.getStatus() == BMAP_STATUS_SUCCESS){
+            var mk = new BMap.Marker(position.point);
+            initMap(position.point);
+        }
+        else {
+            alert('failed'+this.getStatus());
+        }
+    }
+
+    var map = null;
+    function initMap(point){ 
+        //初始化地图 
+        map = new BMap.Map("map"); 
+        //map.addControl(new BMap.NavigationControl()); 
+        //map.addControl(new BMap.ScaleControl()); 
+        //map.addControl(new BMap.OverviewMapControl()); 
+        map.centerAndZoom(point, 15); 
+        map.addOverlay(new BMap.Marker(point));
+
+        //添加地图缩放控件
+        var top_right_navigation = new BMap.NavigationControl({anchor: BMAP_ANCHOR_BOTTOM_RIGHT, type: BMAP_NAVIGATION_CONTROL_ZOOM}); //右
+        map.addControl(top_right_navigation);
+
+        //定位按钮
+        var geolocationControl = new BMap.GeolocationControl();
+        geolocationControl.addEventListener("locationSuccess", function(e){
+            // 定位成功事件
+            var address = '';
+            address += e.addressComponent.province;
+            address += e.addressComponent.city;
+            address += e.addressComponent.district;
+            address += e.addressComponent.street;
+            address += e.addressComponent.streetNumber;
+            //alert("当前定位地址为：" + address);
+        });
+        geolocationControl.addEventListener("locationError",function(e){
+            // 定位失败事件
+            //alert(e.message);
+        });
+        map.addControl(geolocationControl);
+
+
+
+        //单击  获取坐标，添加标注
+        map.addEventListener("click", showInfo);
+    } 
+
+    // 编写自定义函数,创建标注
+    function addMarker(point,label){
+        var marker = new BMap.Marker(point);
+        map.addOverlay(marker);
+        marker.setLabel(label);
+    }
+    function showInfo(e){
+        //alert(e.point.lng + ", " + e.point.lat);
+        //删除所有标注
+        deletePoint();
+        var point = e.point;//鼠标点
+        addMarker(point,new BMap.Label("目标点",{offset:new BMap.Size(20,-0)}));
+    }
+    
+
+    //删错所有标注
+    function deletePoint() {
+        var allOverlay = map.getOverlays();
+        for (var i = 0; i < allOverlay.length; i++) {
+                map.removeOverlay(allOverlay[i]);
+        /*if (allOverlay[i].getLabel().content == num) {
+
+                map.removeOverlay(allOverlay[i]);
+                return false;
+            }*/
+        }
+    }
+
+
+
+</script> 
+</head> 
+<body> 
+<div id="map"></div> 
+</body> 
+</html> 

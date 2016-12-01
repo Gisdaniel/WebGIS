@@ -1,0 +1,92 @@
+
+页面布局参考网站
+http://developer.baidu.com/map/jsdemo.htm#i8_2
+
+如何在一堆框架（Frame）上弹出div层
+http://www.zhcexo.com/how-to-put-div-over-frame/
+
+
+百度地图之添加控件——比例尺、缩略图、平移缩放
+http://www.knowsky.com/607289.html
+
+javascript使用百度地图api和html5特性获取浏览器位置
+http://www.jb51.net/article/45443.htm
+
+JS调用百度地图的删除标注功能时出现getLabel().content为空或者不是对象
+https://segmentfault.com/q/1010000002950190
+
+JavaScript API 极速版 V1.0
+http://developer.baidu.com/map/jsmobile.htm
+http://developer.baidu.com/map/jsdemo-mobile.htm#b0_1
+
+JavaScript API v2.0
+http://lbsyun.baidu.com/index.php?title=jspopular
+示例中心
+http://developer.baidu.com/map/jsdemo.htm#b0_2
+
+百度地图 javascript 缩放控件
+
+调用百度地图API实现手机自动定位 （逆地址解析）
+http://www.itnose.net/detail/6366167.html
+
+http://blog.csdn.net/u010226845/article/details/50236591
+
+参照官网的demo进行定位
+var geolocation = new BMap.Geolocation();
+geolocation.getCurrentPosition(function(r){
+    if(this.getStatus() == BMAP_STATUS_SUCCESS){
+        var mk = new BMap.Marker(r.point);
+        map.addOverlay(mk);
+        map.panTo(r.point);
+        alert('您的位置：'+r.point.lng+','+r.point.lat);
+   }
+  else {
+      alert('failed'+this.getStatus());
+  }        
+},{enableHighAccuracy: true})
+显示出来的位置和实际位置偏差挺多的，估计得有几百米，在同一个地方，我用手机浏览器打开百度地图定位出来的位置就和实际位置差不多，请问是什么原因导致的定位偏差这么大的问题呀？希望工程师能解疑一下。
+
+
+http://blog.csdn.net/u010226845/article/details/50236591
+html5定位获取当前位置并在百度地图上显示
+http://www.jb51.net/html5/208408.html
+http://www.oschina.net/code/snippet_185836_50068
+http://www.cnblogs.com/dengxinglin/archive/2012/12/13/2816285.html
+
+http://javaz.cn/site/javaz/js_studey/info/2016/46606.html
+http://www.xuebuyuan.com/2193457.html
+http://www.jb51.net/article/50051.htm
+http://blog.csdn.net/u010226845/article/details/50236591
+http://lbsyun.baidu.com/index.php?title=jspopular
+http://www.cnblogs.com/liuswi/p/3994757.html
+http://blog.csdn.net/u010226845/article/details/50236591
+
+
+百度地图JS API 关于点标注的onmouseover事件
+
+你这个panel和标注marker是自己定义的吗？如果是直接调用的百度的接口是不能添加事件的  除非自己定义的
+
+如下：
+   localSearch.setSearchCompleteCallback(function (searchResult) {
+        var poi = searchResult.getPoi(0);
+        var marker = new BMap.Marker("南京市",13);
+        map.addOverlay(marker);
+        //自定义标注内容
+        var content = document.getElementById("text_").value + "<br/><br/>名称：" + poi.title + "<br/>地址：" + poi.Address;
+        var infoWindow = new BMap.InfoWindow("<p style='font-size:14px;'>" + content + "</p>");
+        marker.addEventListener("click", function () { this.openInfoWindow(infoWindow); });
+    });
+	
+
+	
+
+
+
+
+
+
+
+
+
+
+

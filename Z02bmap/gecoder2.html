@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>百度地图示例</title>
+    <style type="text/css">
+        body, html{width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+        #l-map{height:650px;width:100%;}
+        #r-result{width:100%; font-size:14px;line-height:20px;}
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=E7674a70c73761474b47c1b2add1add4"></script>
+</head>
+<body>
+    <div id="l-map"></div>
+    <div id="r-result">
+        <input type="button" value="批量地址解析" onclick="bdGEO()" />
+        <div id="result"></div>
+    </div>
+    <br/>
+    <div id="r-result2">
+        经度: <input id="longitude" type="text" style="width:100px; margin-right:10px;" />
+        纬度: <input id="latitude" type="text" style="width:100px; margin-right:10px;" />
+        <input type="button" value="查询" onclick="theLocation()" />
+    </div>
+
+</body>
+</html>
+<script type="text/javascript">
+    // 百度地图API功能
+    var map = new BMap.Map("l-map");
+    map.centerAndZoom(new BMap.Point(117.269945,31.86713), 15);
+    map.enableScrollWheelZoom(true);
+    //map.addControl(new BMap.ZoomControl()); //添加地图缩放控件
+    var top_right_navigation = new BMap.NavigationControl({anchor: BMAP_ANCHOR_BOTTOM_RIGHT, type: BMAP_NAVIGATION_CONTROL_ZOOM}); //右
+    map.addControl(top_right_navigation);    
+
+    map.addControl(new BMap.MapTypeControl());   //添加地图类型控件(地图、卫星、三维)
+    
+  /*  // 添加带有定位的导航控件
+  var navigationControl = new BMap.NavigationControl({
+    // 靠左上角位置
+    anchor: BMAP_ANCHOR_TOP_LEFT,
+    // LARGE类型
+    type: BMAP_NAVIGATION_CONTROL_LARGE,
+    // 启用显示定位
+    enableGeolocation: true
+  });
+  map.addControl(navigationControl);*/
+  // 添加定位控件
+  var geolocationControl = new BMap.GeolocationControl();
+  geolocationControl.addEventListener("locationSuccess", function(e){
+    // 定位成功事件
+    var address = '';
+    address += e.addressComponent.province;
+    address += e.addressComponent.city;
+    address += e.addressComponent.district;
+    address += e.addressComponent.street;
+    address += e.addressComponent.streetNumber;
+    //alert("当前定位地址为：" + address);
+  });
+  geolocationControl.addEventListener("locationError",function(e){
+    // 定位失败事件
+    //alert(e.message);
+  });
+  map.addControl(geolocationControl);
+
+    var index = 0;
+    var myGeo = new BMap.Geocoder();
+    var adds = [
+        "武汉保利十二橡树庄园",
+      "武汉市江夏区商贸物流中心北段"
+        
+    ];
+    function bdGEO(){
+        var add = adds[index];
+        geocodeSearch(add);
+        index++;
+    }
+    function geocodeSearch(add){
+        if(index < adds.length){
+            setTimeout(window.bdGEO,400);
+        } 
+        myGeo.getPoint(add, function(point){
+            if (point) {
+                document.getElementById("result").innerHTML +=  index + "、" + add + ":" + point.lng + "," + point.lat + "</br>";
+                var address = new BMap.Point(point.lng, point.lat);
+                addMarker(address,new BMap.Label(index+":"+add,{offset:new BMap.Size(20,-10)}));
+            }
+        }, "武汉市");
+    }
+    // 编写自定义函数,创建标注
+    function addMarker(point,label){
+        var marker = new BMap.Marker(point);
+        map.addOverlay(marker);
+        marker.setLabel(label);
+    }
+
+    function showInfo(e){
+        //alert(e.point.lng + ", " + e.point.lat);
+        
+        //$("#result").val("" +e.point.lng + ", " + e.point.lat);
+
+        document.getElementById("result").innerHTML = "" +e.point.lng + ", " + e.point.lat;
+
+        deletePoint();
+        var point = e.point;//鼠标点
+        addMarker(point,new BMap.Label("目标点",{offset:new BMap.Size(20,-10)}));
+    }
+    map.addEventListener("click", showInfo);
+
+
+    function deletePoint() {
+        var allOverlay = map.getOverlays();
+        for (var i = 0; i < allOverlay.length; i++) {
+                map.removeOverlay(allOverlay[i]);
+                //return false;
+        /*if (allOverlay[i].getLabel().content == num) {
+
+                map.removeOverlay(allOverlay[i]);
+                return false;
+            }*/
+        }
+    }
+
+    // 用经纬度设置地图中心点
+    function theLocation(){
+        if(document.getElementById("longitude").value != "" && document.getElementById("latitude").value != ""){
+            map.clearOverlays(); 
+            var new_point = new BMap.Point(document.getElementById("longitude").value,document.getElementById("latitude").value);
+            var marker = new BMap.Marker(new_point);  // 创建标注
+            map.addOverlay(marker);              // 将标注添加到地图中
+            map.panTo(new_point);      
+        }
+    }
+</script>

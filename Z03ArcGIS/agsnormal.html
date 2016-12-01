@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+    <title>第一个JavaScript API应用</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.13/dijit/themes/claro/claro.css"> 
+    <link rel="stylesheet" href="http://js.arcgis.com/3.13/esri/css/esri.css"> 
+
+    <script src="http://js.arcgis.com/3.13/"></script>
+
+    <script type="text/javascript">
+      //引入相关命名空间
+      dojo.require("esri.map");
+      dojo.require("esri.SpatialReference");
+      dojo.require("esri.layers.ArcGISTiledMapServiceLayer");
+      dojo.require("esri.layers.ArcGISDynamicMapServiceLayer");
+
+      var map;//地图容器
+
+      //地图初始化函数
+      function init(){
+        var initialExtent = new esri.geometry.Extent(-127.968857954995, 25.5778580720472, -65.0742781827045,51.2983251993735, new esri.SpatialReference({wkid:4326}));
+
+        var map = esri.Map("map",{extent:initialExtent});
+
+        //ArcGISTiledMapServiceLayer用于支持Cache的Tile地图
+        var tiledMapServer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/NGS_Topo_US_2D/MapServer");
+        //将tiledMapServer加入到地图控件Map中
+        map.addLayer(tiledMapServer);
+
+        //ArcGISDynamicMapServiceLayer用于支持Dynamic地图
+        var dynamicMapServer = new esri.layers.ArcGISDynamicMapServiceLayer("http://mypc/ArcGIS/rest/services/USA/MapServer");
+        //设置要显示的图层
+        dynamicMapServer.setVisibleLayers([2,1,0]);
+        //图层过滤设置，图层0只显示POP2000>250000的元素
+        // var layerDefs = [];
+        // layerDefs[0] = "POP2000>250000";
+        // dynamicMapServiceLayer.setLayerDefinitions(layerDefs);
+        // map.addLayer(dynamicMapServiceLayer);
+
+        //给地图控件添加视图变化监听事件
+        dojo.connect(map,"onExtentChange",showExtent);
+
+        //给地图控件添加载入完成（onLoad）监听事件
+        dojo.connect(map,"onLoad",function(){
+          //给地图控件添加载鼠标移动监听事件
+          dojo.connect(map,"onMouseMove",showCoordinates);
+          //给地图控件添加载鼠标拖拽监听事件
+          dojo.connect(map,"onMouseDrag",showCoordinates);
+
+        });
+
+      }
+
+      //显示地图范围
+      function showExtent(extent){
+        var s="地图范围：<br/>XMin:"+extent.xmin+"<br/>YMin:"+extent.ymin+"<br/>XMax:"+extent.xmax +"<br/>YMax:"+extent.ymax;
+        dojo.byId("info").innerHTML=s;
+      }
+
+      //显示鼠标坐标
+      function showCoordinates(event){
+        var mp = event.mapPoint;
+        var mp2 = event.screenPoint;
+         dojo.byId("info2").innerHTML="地理坐标："+mp.x+","+mp.y+"<br/>屏幕坐标："+mp2.x+","+mp2.y;
+      }
+
+      dojo.addOnLoad(init);
+
+
+    </script>
+
+</head>
+
+<body>
+  <table>
+    <tr>
+      <td><div id="map" style="width:600px; height:450px; border:1px solid #000;"></div></td>
+      <td valign="top"><div id="info" ></div><div id="info2" ></div></td>
+    </tr>
+  </table>
+</body>
+
+</html>

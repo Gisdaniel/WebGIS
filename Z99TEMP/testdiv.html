@@ -1,0 +1,117 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>js SplitPanel</title>
+</head>
+<body >
+<div style="width:960px; height:700px; margin:0px auto;">
+<div id="header" style="background-color:rgb(255,0,0);width:100%;height:30px;">header</div>
+<div id="left"  style="background-color:#1ef; width:200px;height:100%; float:left">Left</div>
+<div id="center" style="background-color:blue; width:760px;height:100%; float:left; overflow:hidden;" >
+    <div id="centerLeft" style="background-color:blue; width:500px;height:100%; float:left;">
+        <div id='top'  style="background-color:blue; width:100%;height:200px;">center top </div>
+        <div id='bottom'  style="background-color:#fff; width:100%;height:500px;">center bottom </div>
+     </div>
+     <div id="right" style="background-color:yellow; width:250px;height:100%; float:left">right</div>
+</div>
+
+</div>
+</body>
+<script type="text/javascript">
+
+var $=function(id){
+    return document.getElementById(id);
+};
+function bindEvent(obj,evt,fun){
+    if(window.addEventListener){
+        obj.addEventListener(evt,function(e){fun(e);},false);
+    }else{
+        obj.attachEvent('on'+evt,fun);
+    }
+}
+
+function SplitPanel(panel1,panel2,t,splitWide, panel1MinSize,panel2MinSize)
+{
+    if(panel1 && panel2)
+    {
+        this.Panel1=panel1;
+        this.Panel2=panel2;
+        this.T=t?t:'H'; // 类型 H （水平方向） V 垂直方向
+        this.SplitWide=splitWide?splitWide:5; // 分隔条粗
+        this.Panel1MinSize=panel1MinSize?panel1MinSize:100; // 最小宽度 或者 高度
+        this.Panel2MinSize=panel2MinSize?panel2MinSize:100;// 最小宽度 或者 高度
+        this.MouseDown=0;
+        this.P=0; 
+        this.init();
+    }
+};
+
+SplitPanel.prototype.init=function()
+{ 
+    var sp = this;
+    var size =sp.T=='H'?(sp.Panel1.offsetWidth+sp.Panel2.offsetWidth):(sp.Panel1.offsetHeight+sp.Panel2.offsetHeight);
+    var p=0;
+    var splitPanel = document.createElement('div');
+    splitPanel.style.cssText =  "background-color:#ddd;cursor:crosshair;overflow:hidden;" + (sp.T=='H'?'width:'+sp.SplitWide+'px;height:100%;float:left;':'width:100%;height:'+sp.SplitWide+'px;');
+    sp.Panel2.parentNode.insertBefore(splitPanel,sp.Panel2);
+    sp.T=='H'?(sp.Panel2.style.width =sp.Panel2.offsetWidth-sp.SplitWide +'px'):(sp.Panel2.style.height =(sp.Panel2.offsetHeight-sp.SplitWide) +'px');
+    
+    splitPanel.onmouseover=function(){this.style.backgroundColor='red';};
+    splitPanel.onmouseout=function(){this.style.backgroundColor='#ddd';};
+    splitPanel.onmousedown=function(e){sp.MouseDown=1; e=e||event; sp.P=sp.T=='H'?(e.x||e.pageX):(e.y||e.pageY); };
+    bindEvent(document.body,'mousemove',function(e)
+    {  
+         if(sp.MouseDown)
+          { 
+               e=e||event;
+               if(sp.T=='H')
+               {
+                  p = e.x||e.pageX;
+                  var w2= sp.Panel2.offsetWidth  + (sp.P-p);
+                  var w1= size-w2-sp.SplitWide;
+                  if(w2<=sp.Panel2MinSize)
+                  {
+                    sp.Panel2.style.width = sp.Panel2MinSize +"px";
+                    sp.Panel1.style.width =  size-sp.Panel2MinSize -sp.SplitWide +"px";
+                    return;
+                  }
+                  if(w1<=sp.Panel1MinSize)
+                  {
+                    sp.Panel2.style.width = size -sp.Panel1MinSize-sp.SplitWide +"px";
+                    sp.Panel1.style.width =sp.Panel1MinSize   +"px";
+                    return;
+                  }
+                   sp.Panel2.style.width =w2 +"px";
+                   sp.Panel1.style.width =w1 +"px";
+                
+               }else
+               {
+                  p=e.y||e.pageY;
+                  var h2= sp.Panel2.offsetHeight  + (sp.P-p);
+                  var h1= size-h2-sp.SplitWide;
+                  if(h2<=sp.Panel2MinSize)
+                  {
+                    sp.Panel2.style.height = sp.Panel2MinSize +"px";
+                    sp.Panel1.style.height =  size-sp.Panel2MinSize -sp.SplitWide +"px";
+                    return;
+                  }
+                  if(h1<=sp.Panel1MinSize)
+                  {
+                    sp.Panel2.style.height = size -sp.Panel1MinSize-sp.SplitWide +"px";
+                    sp.Panel1.style.height =sp.Panel1MinSize   +"px";
+                    return;
+                  }
+                   sp.Panel2.style.height =h2 +"px";
+                   sp.Panel1.style.height =h1 +"px";
+               }
+               sp.P=p;
+           }
+        });
+       bindEvent(document.body,'mouseup',function(e){sp.MouseDown=0;});
+};
+var sp = new SplitPanel($('left'),$('center'),'H',5,100,300);
+var sp1 = new SplitPanel($('centerLeft'),$('right'),'H',5,300,100);
+var sp2 = new SplitPanel($('top'),$('bottom'),'V');
+</script>
+</html>

@@ -1,0 +1,263 @@
+
+
+单行垂直居中
+height:20px;
+line-height:20px;
+overflow: hidden;
+
+
+http://www.blueidea.com/tech/web/2006/3231.asp
+
+
+Div +CSS  布局
+
+http://www.divcss5.com/shili/s730.shtml
+http://www.divcss5.com/rumen/r424.shtml
+
+
+js»ñÈ¡ÍøÒ³¸ß¶È
+http://www.cnblogs.com/wuchao/archive/2012/09/03/2668761.html
+http://qiaolevip.iteye.com/blog/2076034
+
+正则表达式
+dongbm="420115001360191531455";
+    var dbmRegex = /^\d+(\d{6})(\d{6})$/;
+    var ret = dbmRegex.exec(dongbm);
+
+
+<object type="text/x-scriptlet" width="500"  height="500" data="http://www.baidu.com">
+</object>
+
+
+<script type="text/javascript">
+    
+    $(document).ready(function(){
+        $("p").after( $("#foo")[0] );
+    });
+
+</script>
+
+</head>
+
+<body>
+
+<b id="foo">Hello</b><p>I would like to say: </p>
+
+</body>
+</html>
+
+
+$("#run").click(function(){
+  $("div:not(:animated)").animate({ left: "+=20" }, 1000);
+});
+
+<button id="run">Run</button><div></div>
+
+
+
+
+jqueryµã»÷Õ¹¿ªÊÕËõÈý¼¶ÏÂÀ­²Ëµ¥´úÂë
+http://www.17sucai.com/pins/17055.html
+http://www.17sucai.com/pins/demoshow/17055
+
+http://www.17sucai.com/pins/9787.html
+http://www.17sucai.com/pins/demoshow/9787
+
+
+CSS¡°width:100%¡±ºÍ¿í¶È¼Ì³ÐµÄÇ³±¡ÈÏÊ¶
+http://www.lyblog.net/detail/286.html
+
+
+
+* html #sidebar{margin-right:-3px;}/*使用此方法解决ie 3像素bug可通过验证*/
+
+DIV上中下布局高度自适应的研究[转]
+http://www.360doc.com/content/13/1130/19/7662927_333477111.shtml
+
+
+网页上中下三分布局即上下固定中间自适应
+http://www.jb51.net/css/160317.html
+
+/**clear float**/
+.clearfix{
+    display:block;zoom:1;
+}
+.clearfix:after{
+    content:".";
+    display:block;
+    height:0;
+    clear:both;
+    visibility:hidden;
+}
+
+
+
+
+
+上中下三行布局，上下定高，中间栏自适应浏览器高度，且内容垂直居中。
+
+/**通过设置中间内容的top和bottom的方法实现绝对定位，中间高度自适应**/
+
+<html>
+<head>
+<meta charset="utf-8">
+<title>div+css上中下布局</title>
+<style>
+    html,body {height:100%; *overflow:hidden; /* 消除IE7下的横向滚动条 */}
+    body {margin:0; padding:0; font-size:30px; text-align:center; color:#fff;}
+    .top ,.nav ,.foot {width:100%; height:100px; position:absolute;}
+    .top {background:red; top:0;}
+    .nav {background:blue; top:100px; bottom:100px; height:auto;}
+    .foot {background:gray; bottom:0;}
+
+    /**通过设置中间内容的top和bottom的方法实现绝对定位，中间高度自适应**/
+</style>
+</head>
+<body>
+    <div class="top">我是头部</div>
+    <div class="nav">这里已经自适应到底部</div>
+    <div class="foot">我是底部</div>
+</body>
+</html>
+
+
+firefox 2.0 / win ie 6/ win ie 7 /opera 8.5 cn/win safari 测试通过。
+　　对于非ie内核浏览器，通过设定display:table、display:table-row和display:table-cell来模拟表格的表现形式。 
+　　最外层#box { display:table; }，高度100%，其子层#header/#main/#footer为{ display:table-row; }，因此可以模拟表格的行效果，上下定高，则中间不定高的层自适应高度。 
+　　#wrap层为{ display:table-cell; }模拟单元格，因此可以设定{ vertical-align:middle; }，垂直居中。
+　　由于Win IE不支持{ display:table; }，因此，只能采取定位的方式实现。<!--[if IE]>内是针对ie的设定。
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" /> 
+<title>上中下三行布局，上下定高，中间栏自适应浏览器高度，且内容垂直居中</title> 
+<style type="text/css"> 
+* { 
+margin:0; 
+padding:0; 
+} 
+html, 
+body, 
+#box { 
+height:100%; 
+font:small/1.5 "宋体", serif; 
+} 
+body { 
+text-align:center; 
+} 
+#box { 
+text-align:left; 
+background:#666; 
+display:table; 
+width:80%; 
+margin:0 auto; 
+position:relative; 
+} 
+#box > div { 
+display:table-row; 
+} 
+#header, 
+#footer { 
+background:#fcc; 
+height:50px; 
+} 
+#main { 
+background:#ccf; 
+} 
+#main #wrap { 
+display:table-cell; 
+background:#ffc; 
+vertical-align:middle; 
+} 
+#text { 
+text-align:center; 
+} 
+</style> 
+<!--[if IE]> 
+<style type="text/css"> 
+#header, 
+#footer { 
+width:100%; 
+z-index:3; 
+position:absolute; 
+}
+ 
+ 
+#footer { 
+bottom:0; 
+} 
+#main { 
+height:100%; 
+z-index:1; 
+position:relative; 
+} 
+#main #wrap { 
+position:absolute; 
+top:50%; 
+width:100%; 
+text-align:left; 
+} 
+#main #text { 
+position:relative; 
+width:100%; 
+top:-50%; 
+background:#ccc; 
+} 
+</style> 
+<![endif]--> 
+</head>
+<body> 
+<div id="box"> 
+<div id="header">header</div> 
+<div id="main"> 
+<div id="wrap"> 
+<div id="text"> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+<p>内容内容</p> 
+</div> 
+</div> 
+</div> 
+<div id="footer">footer</div> 
+</div> 
+</body> 
+</html>
+
+
+CSS Hack整理
+
+http://www.3lian.com/edu/2010/05-31/1930.html
+
+http://blog.csdn.net/yousuosi/article/details/8199818
+
+http://www.kwstu.com/ArticleView/divcss_2013929173533658
+
+http://www.aa25.cn/layout/
+
+标准之路  布局教程
+http://www.aa25.cn/layout/
+
+
+
+
+
+
+
+
+
+
+
+
+

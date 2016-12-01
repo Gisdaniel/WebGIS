@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tiled ArcGIS MapServer</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v3.19.1/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v3.19.1/build/ol.js"></script>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      var url = "http://172.16.22.201/ArcGIS/rest/services/HbJxmap2/MapServer";
+
+      var layers = [
+        new ol.layer.Tile({
+          source: new ol.source.OSM()
+        }),
+        new ol.layer.Tile({
+          extent: [113.878723018085,29.9418854007744,115.073688335213,30.5864813872538],
+          source: new ol.source.TileArcGISRest({
+            url: url
+          })
+        })
+      ];
+      var map = new ol.Map({
+        layers: layers,
+        target: 'map',
+        view: new ol.View({
+          center: [114.4, 30.3],
+          projection: 'EPSG:4326',
+          zoom: 11,
+          minZoom: 11,  
+          maxZoom: 16  
+        })
+      });
+    </script>
+  </body>
+</html>

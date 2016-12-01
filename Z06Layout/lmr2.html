@@ -1,0 +1,63 @@
+<html xmlns="http://www.w3.org/1999/xhtml" >  
+<head runat="server">  
+    <title>左中右版式-绝对定位布局</title>  
+
+    <style type="text/css">
+        #wrap{  
+            width:100%;  
+            margin:0 auto;  
+        }  
+        #header{  
+            margin:2px;
+            height:80px;
+            border:solid 1px #0000FF;
+        }  
+        #container{
+            position:relative;  
+            margin:2px;  
+            height:400px;  
+        }  
+        #left_side{
+            position:absolute;
+            top:0px;
+            left:0px;
+            border:solid 1px #0000FF;
+            width:170px;
+            height:100%;
+        }
+        #content{
+            margin:0px 190px 0px 190px;
+            border:solid 1px #0000FF;
+            height:100%;
+        }  
+        #right_side{
+            position:absolute;
+            top:0px;
+            right:0px;
+            border:solid 1px #0000FF;
+            width:170px;
+            height:100%;
+        }
+        #footer{
+            margin:2px;
+            height:80px;
+            border:solid 1px #0000FF;
+        }
+
+    </style>
+
+</head>  
+<body>  
+    <form id="form1" runat="server">  
+    <div id="wrap">  
+        <div id="header">header</div>  
+        <div id="container">  
+            <div id="left_side">left_side</div>  
+            <div id="content">content</div>  
+            <div id="right_side">right-side</div>  
+        </div>  
+        <div id="footer">footer</div>  
+    </div>  
+    </form>  
+</body>  
+</html>  

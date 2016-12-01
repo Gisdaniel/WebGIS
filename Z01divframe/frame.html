@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<title>DIV+CSS practice</title> 
+
+<link rel="stylesheet" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+<style type="text/css">
+  *{ margin: 0;padding: 0;}
+  html, body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, p, blockquote, th, td{ margin:0px; padding:0px;}
+  html,body{ height:100%; font-size: 12px;font-family: "宋体","微软雅黑";color:#000; background:#E0E7F9;}
+  ol,ul,li,dl,dt,dd{ list-style:none;}
+  a{ text-decoration:none;}
+  a:link,a:visited{text-decoration: none;color: #fff;}
+
+
+	#wrapper{ width: 100%;height: 100%;overflow: hidden;position:relative;}
+
+	#header{width: 100%;height: 91px;background:rgb(6,82,168);
+			position: relative;overflow: hidden;;
+		}
+	#mainContainer{margin:0px 0px 0px 0px; border:1px solid #9CAFCF; height:500px; overflow:hidden;}
+    /*leftPart*/
+    #leftPart{float: left;width: 211px;}
+    /*rightPart*/
+    #map {float: right; height: 100%; margin: 0; padding: 0; width:500px; }
+    #footer{
+        position: absolute;
+        width:100%;
+        height:20px;
+        bottom: 0px;
+        background:rgb(6,82,168);
+        text-align: center;
+        line-height: 20px;
+        overflow: hidden;
+        border:1px solid #788DA0;
+    }
+
+    .clear{ clear:both} 
+</style>
+
+<script language="javascript" type="text/javascript" src="../js/jquery.js"></script>
+
+<script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "localhost" 
+      };
+</script>
+<script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+
+
+<script>
+    function getPageWidth() {
+          var width = window.innerWidth; //不同浏览器支持不同
+          if (width == null) {
+              if (document.documentElement && document.documentElement.clientWidth)
+                  width = document.documentElement.clientWidth
+              else
+                  width = document.body.clientWidth;
+          }
+          return width;
+      };
+
+    //mainContaner自适应
+    //document.getElementById("mainContainer").style.height = window.screen.availHeight-91-20;
+    $(document).ready(function() {
+        $("#mainContainer").css("height",window.screen.availHeight-91-20);
+
+        $("#map").css("width",(getPageWidth()-230)+'px');
+    });
+    
+    window.onresize = function(){
+          location.reload(true);
+      }
+
+
+    //地图初始化
+    /*var map;
+    require(["esri/map", "dojo/domReady!"], function(Map) {
+      map = new Map("map", {
+        center: [-118, 34.5],
+        zoom: 8,
+        basemap: "topo",
+    });
+    });*/
+
+    dojo.require("esri.map"); 
+    function init() {   
+      var myMap = new esri.Map("map");
+      var myTiledMapServiceLayer = new 
+      esri.layers.ArcGISTiledMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/TaxParcel/AssessorsBasemap/MapServer");  
+      myMap.addLayer(myTiledMapServiceLayer);  
+    } 
+    dojo.addOnLoad(init);
+
+    /*var map;
+    require(["esri/map","esri/SpatialReference",
+           "esri/layers/ArcGISTiledMapServiceLayer","esri/geometry/Extent"
+           "dojo/domReady"
+          ],function(
+            Map,SpatialReference,ArcGISTiledMapServiceLayer,Extent
+          ){
+            var initialExtent = new Extent(510459, 373483, 548787, 398445);
+            map = Map("map",{extent:initialExtent,spatialReference:{wkid:2435}});
+            //map.spatialReference = new SpatialReference({wkid:2435});
+            var tiledMapServer = new ArcGISTiledMapServiceLayer("http://192.168.100.230:6080/arcgis/rest/services/JCDT/wh_xzq/MapServer");
+            map.addLayer(tiledMapServer);
+    });*/
+    
+
+   
+</script>
+
+</head>
+
+<body>
+	<!--页面容器类，顶级-->
+	<div id="wrapper">
+		<div id="header"></div>
+		<div id="mainContainer">
+            <div id="leftPart" class="leftPart">
+                大家都是搞编程的，一看就明白，我就简单的说下，参数ds是要更新的数据集，Columns是要插入的列表，TableName是要插入的表名，这里需要强调的一点是，插入数据集里的表的字段和类型必须和数据库那边一致，这点重要，要不然插入会报错。
+ 
+　　这里还有加了个分段插入，就是那个for，每400条插入一次，这样可以避免插入的数据太大，会发生超时异常。
+ 
+　　我做项目的时候遇到这种情况是：有些数据是要先保存到本地，比如SqlLite，然后再上传到数据库。
+ 
+　　这里给大家个建议，如果用到wcf，就在传输前对数据集进行压缩，然后到服务端再解压下，这样传输速度会很快。有时间给大家提供压缩的方法。
+ 
+批量更新
+ 
+　　批量更新和批量插入差不多的逻辑，我先贴下代码：
+            </div>
+            <div id="map"></div>
+            <div class="clear"></div> 
+        </div>
+        <div id="footer">&copy;版本授权</div>
+	</div>
+</body>
+
+</html>

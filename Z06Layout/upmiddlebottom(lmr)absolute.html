@@ -1,0 +1,224 @@
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<!--网页上中下三分布局打破了传统的布局方式，实现所谓的上下固定，中间自适应-->
+<!-- 禁止浏览器从本地缓存中调阅页面。--> 
+<meta http-equiv="pragram" content="no-cache"> 
+<!--网页不保存在缓存中，每次访问都刷新页面。--> 
+<meta http-equiv="cache-control" content="no-cache, must-revalidate"> 
+<!--同上面意思差不多，必须重新加载页面--> 
+<!--网页在缓存中的过期时间为0，一旦网页过期，必须从服务器上重新订阅--> 
+<meta http-equiv="expires" content="0"> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<title></title> 
+<style type="text/css">
+    * {
+        margin:0;
+        padding:0;
+        border: 0;
+    }
+    html,body{
+        height:100%;
+        font:small/1.5 "宋体", serif;
+    }
+    body {
+        text-align:center;
+    }
+
+    #wrapper{
+        width:100%;
+        height:100%;
+        text-align: center;
+    }
+    #header{
+            position: absolute;
+            top:0;
+            height:50px;
+            width:100%;
+            background:#690;
+            text-align:center;
+            line-height: 50px;
+        }
+    #content{ 
+            position: absolute;
+            top:50px;
+            bottom: 20px;
+            width:100%;
+            vertical-align:middle;
+            background:white;
+            overflow:hidden;  /* 内容高度宽度自适应 */
+        }
+    #footer{
+        width:100%;
+        height:20px;
+        position:absolute;
+        bottom:0px;
+        line-height: 20px;
+        background:gray;
+        z-index:200;
+    }
+
+    /**clear float**/
+.clearfix{
+    display:block;zoom:1;
+}
+.clearfix:after{
+    content:".";
+    display:block;
+    height:0;
+    clear:both;
+    visibility:hidden;
+}
+#drag{
+    width: 2px;
+    height: 100%;
+    background: #eee;
+    cursor: w-resize;
+    float:left;
+}
+
+.switchPanel {
+    position: absolute;
+    width: 15px;
+    height: 55px;
+    top: 280px;
+    left: 0px;
+    z-index: 100;
+    background: url("../images/mapinfo.png") no-repeat -24px 0px;
+    cursor: pointer;
+}
+
+.switchIcon {
+    position: absolute;
+    width: 4px;
+    height: 10px;
+    top: 22px;
+    left: 3px;
+    background: url("../images/mapinfo.png") no-repeat -27px -22px;
+    cursor: pointer;
+}
+.aui_title {
+    padding-top: 5px;
+}
+
+</style>
+
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript">
+//解决在IE7和8下显示不正常的问题
+        var fullMap = true;
+        var strTheme = "aaaa";
+
+        $("#drag").mousedown(function(e){
+            
+
+        },0);
+
+        $("#drag").mousemove(function(){
+            $("#drag").css("background-color",e.pageX+"px");
+            $("#leftMenu").css("background-color",(e.pageX+2)+"px");
+        },20);
+
+
+        function switchpanel() {
+            var display = $("#leftMenu").css('display');
+            if(display=="none"){
+                $("#leftMenu").show();
+                $('#switchPanel').animate({
+                    left: 221
+                }, 0);
+
+                //$("#content1").css('display','block');
+                $("#map").css('marginLeft','222px');
+            }
+            else{
+                $("#leftMenu").hide();
+                $('#switchPanel').animate({
+                    left: 2
+                }, 0);
+
+                //$("#content1").css('display','none');
+                $("#map").css('marginLeft','2px');
+            }
+                
+
+
+            /*if (strTheme == "") {
+                //未激活专题，不显示左侧栏
+                var themeName = window.parent.themeName;
+                if (themeName == null || themeName == "") return;
+            }
+
+            if (!fullMap) {
+                $('#leftMenu').animate({
+                    width: 1
+                }, 500);
+                $('#switchPanel').animate({
+                    left: 2
+                }, 500);
+                $('#splitBorder').css('display', 'none');
+                $('#switchIcon').css('background-position', '-8px -22px');
+                fullMap = true;
+
+                $("#content1").css('display','none');
+                $("#map").css('marginLeft','3px');
+                
+                //setTimeout(function(){},500);
+
+            } else {
+                $('#leftMenu').animate({
+                    width: 220
+                }, 500);
+                $('#switchPanel').animate({
+                    left: 221
+                }, 500);
+                $('#splitBorder').css('display', 'block');
+                $('#switchIcon').css('background-position', '-27px -22px');
+                fullMap = false;
+                $("#content1").css('display','block');
+                $("#map").css('marginLeft','222px');
+            }
+            */
+        };
+</script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="header" style="font-size:32px;">江夏智慧房管数据采集系统</div>
+        <div id="content" class="clearfix" >
+            <div id="leftMenu" style="float:left; width:220px;height:100%;background:rgb(70,124,162);display:none;">
+                 <iframe src="index.html" style="width:100%;height:100%;" frameborder="no" border="0">
+                </iframe>
+            </div>
+            <div id="drag"></div>
+            <div id="right" style="float:right;width:220px;height:100%;background:white;">right</div>
+            <div id="map" style="height:100%;background:white;margin-left: 2px;margin-right: 220px;">
+                <iframe src="../Z02bmap/bmap.html" style="width:100%;height:100%;" frameborder="no" border="0">
+                </iframe>
+                <div id="switchPanel" class="switchPanel" style="left: 0px;" onclick="switchpanel()">
+                    <div id="switchIcon" class="switchIcon" style="background-position: -8px -22px">
+                    </div> 
+                </div>
+            </div>
+            
+        </div>
+        </div>
+        <div id="footer">footer</div>
+    </div>
+</body>
+
+<script type="text/javascript" >
+    // $(document).ready(function() {
+    //     var width = $(document.body).width()-220-2;
+    //     $("#map").css('width',width+'px');
+    // });
+
+    // $(window).resize(function(){
+    //     var width = $(document.body).width()-220-2;
+    //     $("#map").css('width',width+'px');
+    // });
+</script>
+
+
+</html>

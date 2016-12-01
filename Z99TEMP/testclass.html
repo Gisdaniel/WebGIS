@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>第一个JavaScript API应用</title>
+    <script type="text/javascript">
+        /***定义类***/
+        var ClassA = function(){
+            var _self = this;//把本身引用负值到一变量上
+
+            var _Field = "Test Field"; //私有字段
+            var privateMethod = function(){ //私有方法
+                alert(_self.Property); //调用属性
+            }
+
+            this.Property = "Test Property"; //公有属性
+            this.Method = function(){ //公有方法
+                alert(_Field); //调用私用字段
+                privateMethod(); //调用私用方法
+            };
+
+            /***析构函数***/
+            var init = function(){
+                privateMethod();
+            }
+            init();
+        }
+
+        var c = new ClassA();
+        c.Method(); //使用方法
+    </script>
+</head>
+
+
+<body>
+
+</body>
+
+
+
+
+</html>
+
+
+

@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<title>DIV+CSS practice</title> 
+<link rel="stylesheet" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+<style type="text/css">
+    #content{
+        position: absolute;
+        width:100%;
+        border-bottom: 1px solid #ccc;
+        top: 50px;
+        bottom: 0;
+    }
+
+</style>
+
+<script language="javascript" type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "localhost" 
+      };
+</script>
+<script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+<script>
+    function getPageWidth() {
+          var width = window.innerWidth; //不同浏览器支持不同
+          if (width == null) {
+              if (document.documentElement && document.documentElement.clientWidth)
+                  width = document.documentElement.clientWidth
+              else
+                  width = document.body.clientWidth;
+          }
+          return width;
+      };
+
+    //mainContaner自适应
+    //document.getElementById("mainContainer").style.height = window.screen.availHeight-91-20;
+    $(document).ready(function() {
+        //$("#mainContainer").css("height",window.screen.availHeight-91-20);
+
+        //$("#map").css("width",(getPageWidth()-230)+'px');
+    });
+    
+    window.onresize = function(){
+          location.reload(true);
+      }
+
+
+    //地图初始化
+    /*var map;
+    require(["esri/map", "dojo/domReady!"], function(Map) {
+      map = new Map("map", {
+        center: [-118, 34.5],
+        zoom: 8,
+        basemap: "topo",
+    });
+    });*/
+
+    dojo.require("esri.map"); 
+    function init() {   
+      var myMap = new esri.Map("map");
+      var myTiledMapServiceLayer = new 
+      esri.layers.ArcGISTiledMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/TaxParcel/AssessorsBasemap/MapServer");  
+      myMap.addLayer(myTiledMapServiceLayer);  
+    } 
+    dojo.addOnLoad(init);
+
+    /*var map;
+    require(["esri/map","esri/SpatialReference",
+           "esri/layers/ArcGISTiledMapServiceLayer","esri/geometry/Extent"
+           "dojo/domReady"
+          ],function(
+            Map,SpatialReference,ArcGISTiledMapServiceLayer,Extent
+          ){
+            var initialExtent = new Extent(510459, 373483, 548787, 398445);
+            map = Map("map",{extent:initialExtent,spatialReference:{wkid:2435}});
+            //map.spatialReference = new SpatialReference({wkid:2435});
+            var tiledMapServer = new ArcGISTiledMapServiceLayer("http://192.168.100.230:6080/arcgis/rest/services/JCDT/wh_xzq/MapServer");
+            map.addLayer(tiledMapServer);
+    });*/
+    
+
+   
+</script>
+
+</head>
+
+<body>
+    <div id="content">
+        <div style="width:500px;height:400px;float:left;">aaaaaa</div>
+        <div id="map" style="width:500px;height:400px;float:left;">
+               
+        </div>
+    </div>
+</body>
+
+</html>
