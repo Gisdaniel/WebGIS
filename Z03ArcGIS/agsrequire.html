@@ -23,7 +23,7 @@
           var initialExtent = new Extent(-127.968857954995, 25.5778580720472, -65.0742781827045,51.2983251993735, new esri.SpatialReference({wkid:4326}));
 
           //地图容器初始化
-          var map = Map("map",{extent:initialExtent});
+          map = Map("map",{extent:initialExtent});
 
           //ArcGISTiledMapServiceLayer用于支持Cache的Tile地图
           var tiledMapServer = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/NGS_Topo_US_2D/MapServer");

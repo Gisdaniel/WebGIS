@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>测试页面</title>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+        // window.onload = function(){
+        //     document.getElementById('xyz').onclick = function(){
+        //         document.getElementById('xyz').style.color='red';
+        //     }
+
+        // }
+
+        $(document).ready(function(){
+            $("#xyz").bind('click',function(event){
+                $("#xyz").css('color','red');
+
+                $("<p>Hi There </p>").insertAfter("#xyz");
+                $("#xyz").disable();
+            });
+        });
+
+        
+    </script>
+
+</head>
+
+<body>
+    <button type="button" id="xyz" >点击我</button>
+
+</body>
+
+</html>

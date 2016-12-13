@@ -7,7 +7,7 @@
       Simple Map
     </title>
 
-    <link rel="stylesheet" href="http://127.0.0.1/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+    <link rel="stylesheet" href="http://172.16.88.52/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
     <style>
       html, body, #map { height: 100%; margin: 0; padding: 0; }
     </style>
@@ -19,7 +19,7 @@
           //locale: 'zh',
           //serverIP: "192.168.1.135:8080/dmt" 
           //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
-          serverIP : "127.0.0.1" 
+          serverIP : "172.16.88.52" 
       };
     </script>
 
@@ -28,6 +28,7 @@
     <script src="http://127.0.0.1/arcgis_js_api/library/3.16/3.16/init.js"></script>
     <script>
       var map;
+      var testfun;
       require(["esri/map", "esri/layers/ArcGISTiledMapServiceLayer",
               "esri/config",
               "dojo/domReady!"], 
@@ -54,8 +55,15 @@
           esriConfig.defaults.map.zoomDuration = 100; // default zoomDuration: 500
           esriConfig.defaults.map.zoomRate = 1; // default zoomRate: 25
 
+          function fun(){
+            console.log("fun");
+          };
+
+          testfun = fun;
+
       });
 
+testfun();
       /*dojo.require("esri.map"); 
       function init() {   
           var myMap = new esri.Map("map");

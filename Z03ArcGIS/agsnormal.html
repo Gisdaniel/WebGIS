@@ -53,6 +53,8 @@
 
       }
 
+      dojo.addOnLoad(init);
+
       //显示地图范围
       function showExtent(extent){
         var s="地图范围：<br/>XMin:"+extent.xmin+"<br/>YMin:"+extent.ymin+"<br/>XMax:"+extent.xmax +"<br/>YMax:"+extent.ymax;
@@ -66,7 +68,7 @@
          dojo.byId("info2").innerHTML="地理坐标为："+mp.x+","+mp.y+"<br/>屏幕坐标："+mp2.x+","+mp2.y;
       }
 
-      dojo.addOnLoad(init);
+      
 
 
     </script>
