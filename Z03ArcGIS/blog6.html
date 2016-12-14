@@ -1,49 +1,50 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
-<!--The viewport meta tag is used to improve the presentation and behavior of the samples  on iOS devices-->
-<meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
-<title>Continuous pan across dateline</title>
-<link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">    
-      <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css"> 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples  on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+    <title>Continuous pan across dateline</title>
+    <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+    <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css">
 
-<style>
-html,body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
+    <style type="text/css">
+        html,body {
+          height: 100%;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+        }
 
-.esriScalebar {
-  padding: 20px 20px;
-}
+        .esriScalebar {
+          padding: 20px 20px;
+        }
 
-#map {
-  padding: 0;
-  border: solid 2px;
-  #656868;
-}
+        #map {
+          padding: 0;
+          border: solid 2px;
+          #656868;
+        }
 
-.details {
-  font-size: 14px;
-  font-weight: 700;
-}
+        .details {
+          font-size: 14px;
+          font-weight: 700;
+        }
 
-#coordsInfo {
-  position: absolute;
-  left: 5px;
-  bottom: 5px;
-  font-family: "Helvetica;"
-  font-weight: 800;
-  color: #333399;
-  z-index: 50;
-  font-size: 14pt;
-}
-</style>
-<script type="text/javascript">
+        #coordsInfo {
+          position: absolute;
+          left: 5px;
+          bottom: 5px;
+          font-family: "Helvetica;"
+          font-weight: 800;
+          color: #333399;
+          z-index: 50;
+          font-size: 14pt;
+        }
+    </style>
+
+    <script type="text/javascript">
             var dojoConfig = {
                 parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
                 //isDebug: false,
@@ -53,194 +54,212 @@ html,body {
                 serverIP : "localhost" 
             };
         </script>
-<script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+    <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
 
-<script type="text/javascript">
-  // 引入包
-  dojo.require("dijit.layout.BorderContainer");
-  dojo.require("dijit.layout.ContentPane");
-  dojo.require("esri.map");
-  dojo.require("dijit.Tooltip");
+    <script type="text/javascript">
+        // 引入包  
+        dojo.require("dijit.layout.BorderContainer");  
+        dojo.require("dijit.layout.ContentPane");  
+        dojo.require("esri.map");  
+        dojo.require("dijit.Tooltip");
 
-  var map;  
-  var geodesicGraphic;  // 测量图形
-  var drawGeodesic = false; // 是否开始绘制图形
-  var startLoc, endLoc; // 开始点和结束点
-  var inputSymbol, resultSymbol, markerSymbol;  // 拖拽时符号, 最终结果符号, 标记符号
-  var geometryService;  // 几何服务
+        var map;
+        var geodesicGraphic;//测量图形
+        var drawGeodesic = false;//是否开始绘图
+        var startLoc, endLoc;//开始点和结束点
+        //拖拽时符号，最终结果符号，标记符号
+        var inputSymbol, resultSymbol, markerSymbol;
+        var geometryService; //几何服务
 
-  /**
-   * 初始化函数
-   */
-  function init() {
-    // esri.tasks.GeometryService(url); 创建一个新的GeometryService对象。 URL是一个必要的参数
-    geometryService = new esri.tasks.GeometryService("http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+        function init(){
+            //esri.tasks.GeometryService(url); 创建一个新的GeometryService对象。 URL是一个必要的参数  
+            geometryService = new esri.tasks.GeometryService("http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
 
-    // 设置范围
-    var extent = new esri.geometry.Extent({
-      "xmin" : 2.98,    // 左下角X坐标
-      "ymin" : 17.48,   // 左下角Y坐标 
-      "xmax" : 102.65,  // 右上角X坐标
-      "ymax" : 58.35,   // 右上角Y坐标
-      "spatialReference" : {  // 空间参考
-        "wkid" : 4326
-      }
-    });
+            //设置范围
+            var extent = new esri.geometry.Extent({  
+                "xmin" : 2.98,      // 左下角X坐标  
+                "ymin" : 17.48,     // 左下角Y坐标   
+                "xmax" : 102.65,    // 右上角X坐标  
+                "ymax" : 58.35,     // 右上角Y坐标  
+                "spatialReference" : {  // 空间参考  
+                    "wkid" : 4326  
+                }  
+            });
 
-    // esri.Map(divId, options?),options可选参数，有很多，参考api
-    map = new esri.Map("map", {
-      wrapAround180 : true, // 如果为true，支持连续泛跨越日界线,类似与无缝滚动marquee效果
-      extent : esri.geometry.geographicToWebMercator(extent)  // 地图图形范围
-    });
-    // 加入全球街底图。 ArcGIS Online的网站服务 http://arcgisonline/home/search.html?t=content&f=typekeywords:service    
-    var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
-    map.addLayer(basemap);
+            // esri.Map(divId, options?),options可选参数，有很多，参考api 
+            map = new esri.Map("map",{
+                wrapAround180 : true,// 如果为true，支持连续泛跨越日界线,类似与无缝滚动marquee效果  
+                extent: esri.geometry.geographicToWebMercator(extent)// 地图图形范围
+            });
+
+             // 加入全球街底图
+             var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");  
+             map.addLayer(basemap);  
+
+             /**  
+             * SimpleLineSymbol(),线符号用于在图形图层上绘制的线性特征，可以是实线或短划线和点,破折号等预定义的模式。  
+             * esri.symbol.SimpleLineSymbol()；esri.symbol.SimpleLineSymbol(json);esri.symbol.SimpleLineSymbol(style,color,width)3种构造函数  
+               
+             * SimpleMarkerSymbol，用于显示作为一个简单的形状。    
+             * esri.symbol.SimpleMarkerSymbol(json)，esri.symbol.SimpleMarkerSymbol()，esri.symbol.SimpleMarkerSymbol(style, size, outline, color)3种构造函数  
+             */  
+            
+            inputSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASH, new dojo.Color([ 255, 0, 0 ]), 2);  // 拖拽时符号  
+            resultSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([ 255, 0, 0 ]), 2);    // 最终显示结果符号 
+
+            markerSymbol = new esri.symbol.SimpleMarkerSymbol(  // 标记符号  
+                esri.symbol.SimpleMarkerSymbol.STYLE_DIAMOND,   // 样式，STYLE_CIRCLE(●)，STYLE_CROSS(+)，STYLE_DIAMOND(◆)，STYLE_SQUARE(■)，STYLE_X(X)  
+                10,     // 像素  
+                new esri.symbol.SimpleLineSymbol(  
+                    esri.symbol.SimpleLineSymbol.STYLE_SOLID,   //样式，STYLE_DASH，STYLE_DASHDOT，STYLE_DASHDOTDOT，STYLE_DOT，STYLE_NULL，STYLE_NULL  
+                    new dojo.Color(  
+                        [255, 0, 0, 0.5]    // 颜色，0.5为透明度  
+                    ),6     // 像素  
+                ),  
+                new dojo.Color(  
+                        [255, 0, 0, 0.9]  
+                    )  
+            );  
+
+                dojo.connect(map,'onLoad',function(theMap){
+                    //设置绘图事件
+                    // 鼠标移动事件，用于显示经纬度。  
+
+                    dojo.connect(map, "onMouseDragStart", onMouseDragStart);    // 鼠标绘制开始事件  
+                    dojo.connect(map, "onMouseDrag", onMouseDrag);          // 鼠标拖动事件  
+                    dojo.connect(map, "onMouseMove", showCoordinates);      // 鼠标移动事件，用于显示经纬度。  
+                    dojo.connect(map, "onMouseDragEnd", onMouseDragEnd);    // 鼠标绘制结束事件  
+          
+                    // 地图随浏览器调整大小  
+                    dojo.connect(dijit.byId('map'), 'resize', map, map.resize);  
+
+                });
+            
+    }
+
+
+       
 
     /**
-     * SimpleLineSymbol(),线符号用于在图形图层上绘制的线性特征，可以是实线或短划线和点,破折号等预定义的模式。
-     * esri.symbol.SimpleLineSymbol()；esri.symbol.SimpleLineSymbol(json);esri.symbol.SimpleLineSymbol(style,color,width)3种构造函数
-     
-     * SimpleMarkerSymbol，用于显示作为一个简单的形状。  
-     * esri.symbol.SimpleMarkerSymbol(json)，esri.symbol.SimpleMarkerSymbol()，esri.symbol.SimpleMarkerSymbol(style, size, outline, color)3种构造函数
+     * *在淡季按钮是触发事件，是否开始绘制
+     * @param  {[type]} enabled [description]
+     * @return {[type]}         [description]
      */
-    inputSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASH, new dojo.Color([ 255, 0, 0 ]), 2);  // 拖拽时符号
-    resultSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([ 255, 0, 0 ]), 2);  // 最终显示结果符号
-    
-    markerSymbol = new esri.symbol.SimpleMarkerSymbol(  // 标记符号
-        esri.symbol.SimpleMarkerSymbol.STYLE_DIAMOND, // 样式，STYLE_CIRCLE(●)，STYLE_CROSS(+)，STYLE_DIAMOND(◆)，STYLE_SQUARE(■)，STYLE_X(X)
-        10,   // 像素
-        new esri.symbol.SimpleLineSymbol(
-          esri.symbol.SimpleLineSymbol.STYLE_SOLID, //样式，STYLE_DASH，STYLE_DASHDOT，STYLE_DASHDOTDOT，STYLE_DOT，STYLE_NULL，STYLE_NULL
-          new dojo.Color(
-            [255, 0, 0, 0.5]  // 颜色，0.5为透明度
-          ),6   // 像素
-        ),
-        new dojo.Color(
-            [255, 0, 0, 0.9]
-          )
-        );
-    
-    dojo.connect(map, 'onLoad', function(theMap) {  // 初始化加载事件
-      // 设定绘图事件
-      dojo.connect(map, "onMouseDragStart", onMouseDragStart);  // 鼠标绘制开始事件
-      dojo.connect(map, "onMouseDrag", onMouseDrag);      // 鼠标拖动事件
-      dojo.connect(map, "onMouseMove", showCoordinates);    // 鼠标移动事件，用于显示经纬度。
-      dojo.connect(map, "onMouseDragEnd", onMouseDragEnd);  // 鼠标绘制结束事件
+    function drawFeedback(enabled){
+        if(enabled){
+            map.disablePan();// 平移地图时不允许使用鼠标的api方法
+            map.setMapCursor('crosshair');
+            drawGeodesic = true;
+        } else {
+            map.enablePan();  
+            map.setMapCursor('default');    // 设置默认的鼠标光标  
+            drawGeodesic = false; 
+        }
+    }
 
-      // 地图随浏览器调整大小
-      dojo.connect(dijit.byId('map'), 'resize', map, map.resize);
-    });
-  }
+    /**
+     * *
+     * @param  {[type]} evt [description]
+     * @return {[type]}     [description]
+     */
+    function onMouseDragStart(evt){
+        if(drawGeodesic){
+            // 在当前图形坐标位置下加入“开始点”标记符号
+            // esri.Graphic(geometry, symbol, attributes, infoTemplate)和(JSON)2种
+            startLoc = new esri.Graphic(evt.mapPoint, markerSymbol);
+            map.graphics.add(startLoc);
+            geodesicGraphic = null;
+        }
+    }
+
+    /**  
+     * 鼠标拖动函数  
+     */  
+    function onMouseDrag(evt) {  
+        showCoordinates(evt);   // 调用函数，在左下角位置显示坐标值  
+        if (drawGeodesic) {  
+            var geodesicGeom = createLine(startLoc.geometry, evt.mapPoint);     // 调用创建符号线的函数，返回geometry对象  
+            if (geodesicGraphic == null) {  
+                geodesicGraphic = new esri.Graphic(geodesicGeom, inputSymbol);  // 创建拖拽时的符号图形对象  
+                map.graphics.add(geodesicGraphic);  // 将对象显示在地图中  
+                  
+                geodesicGraphic.getDojoShape().moveToFront();   // 返回ESRI图形的Dojo gfx图形。常见用途为getDojoShape方法是改变图形的绘制顺序使用moveToFront和moveToBack方法。  
+            } else {  
+                geodesicGraphic.setGeometry(geodesicGeom);  
+            }  
+        }  
+    }  
+
+    /**  
+     * 鼠标拖动结束函数  
+     */  
+    function onMouseDragEnd(event) {  
+        if (drawGeodesic) {  
+            geodesicGraphic.setSymbol(resultSymbol);      
+            endLoc = new esri.Graphic(event.mapPoint, markerSymbol);    // 结束符号  
+            map.graphics.add(endLoc);  
+            drawFeedback(false);  
+        }  
   
-  /**
-   * 在单击按钮时触发事件，是否开始绘制
-   * Return Boolean
-   */
-  function drawFeedback(enabled) {
-    if (enabled) {
-      map.disablePan(); // 平移地图时不允许使用鼠标的api方法
-      map.setMapCursor('crosshair');  // 设置地图的光标显示，默认是一个箭头
-      drawGeodesic = true;
-    } else {
-      map.enablePan();
-      map.setMapCursor('default');  // 设置默认的鼠标光标
-      drawGeodesic = false;
-    }
-  }
+    }  
 
-  /**
-   * 鼠标开始绘制函数
-   */
-  function onMouseDragStart(event) {
-    if (drawGeodesic) {
-      // 在当前图形坐标位置下加入“开始点”标记符号
-      startLoc = new esri.Graphic(event.mapPoint, markerSymbol);  // esri.Graphic(geometry, symbol, attributes, infoTemplate)和(JSON)2种
-      map.graphics.add(startLoc);  // 添加标记图形
-      geodesicGraphic = null;
-    }
-  }
-
-  /**
-   * 鼠标拖动函数
-   */
-  function onMouseDrag(evt) {
-    showCoordinates(evt); // 调用函数，在左下角位置显示坐标值
-    if (drawGeodesic) {
-      var geodesicGeom = createLine(startLoc.geometry, evt.mapPoint);   // 调用创建符号线的函数，返回geometry对象
-      if (geodesicGraphic == null) {
-        geodesicGraphic = new esri.Graphic(geodesicGeom, inputSymbol);  // 创建拖拽时的符号图形对象
-        map.graphics.add(geodesicGraphic);  // 将对象显示在地图中
-        
-        geodesicGraphic.getDojoShape().moveToFront(); // 返回ESRI图形的Dojo gfx图形。常见用途为getDojoShape方法是改变图形的绘制顺序使用moveToFront和moveToBack方法。
-      } else {
-        geodesicGraphic.setGeometry(geodesicGeom);
-      }
-    }
-  }
-
-  /**
-   * 鼠标拖动结束函数
-   */
-  function onMouseDragEnd(event) {
-    if (drawGeodesic) {
-      geodesicGraphic.setSymbol(resultSymbol);  
-      endLoc = new esri.Graphic(event.mapPoint, markerSymbol);  // 结束符号
-      map.graphics.add(endLoc);
-      drawFeedback(false);
-    }
-
-  }
-
-  /**
-   * 创建绘制线函数
-   * Return Geometry 对象
-   */
-  function createLine(start, end) {
-    // 创建一个新的折线对象。
-    var polyline = new esri.geometry.Polyline(map.spatialReference);
-    polyline.addPath([ start, end ]); // 添加路径的折线数组，可以是数字数组，点数组或json对象之一，每个数组2个或更多点，
-
-    // 转换 wgs84 and densify 显示最短的绘制路径
-    // esri.geometry.geodesicDensify(geometry, maxSegmentLength)
-    var geodesicGeomGeo = esri.geometry.geodesicDensify(esri.geometry.webMercatorToGeographic(polyline), 100000);
-
-    // 从WGS84转换到Web墨卡托显示
-    var geodesicGeom = esri.geometry.geographicToWebMercator(geodesicGeomGeo);
-
-    return geodesicGeom;
-  }
-
-  /**
-   * 清除绘制完的图形
-   */
-  function clearGraphics() {
-    map.graphics.clear(); // 清除图形
-    drawGeodesic = false;
-  }
-
-  /**
-   * 显示坐标的函数
-   */
-  function showCoordinates(evt) {
-    var mp = esri.geometry.webMercatorToGeographic(evt.mapPoint); // 转换几何，从Web墨卡托单位的地理单位。返回值: Geometry
-    dojo.byId("coordsInfo").innerHTML = "Lat(纬度):" + mp.y.toFixed(2) + " Lon(经度):" + mp.x.toFixed(2); // 显示的值保留两位小数，使用JS方法中的toFixed(num)方法
-  }
-  dojo.addOnLoad(init); // 初始化加载
+    /**  
+     * 创建绘制线函数  
+     * Return Geometry 对象  
+     */  
+    /**  
+     * 创建绘制线函数  
+     * Return Geometry 对象  
+     */  
+    function createLine(start, end) {  
+        // 创建一个新的折线对象。  
+        var polyline = new esri.geometry.Polyline(map.spatialReference);  
+        polyline.addPath([ start, end ]);   // 添加路径的折线数组，可以是数字数组，点数组或json对象之一，每个数组2个或更多点，  
   
-</script>
+        // 转换 wgs84 and densify 显示最短的绘制路径  
+        // esri.geometry.geodesicDensify(geometry, maxSegmentLength)  
+        var geodesicGeomGeo = esri.geometry.geodesicDensify(esri.geometry.webMercatorToGeographic(polyline), 100000);  
+  
+        // 从WGS84转换到Web墨卡托显示  
+        var geodesicGeom = esri.geometry.geographicToWebMercator(geodesicGeomGeo);  
+  
+        return geodesicGeom;  
+    }  
+
+    /**  
+     * 清除绘制完的图形  
+     */  
+    function clearGraphics() {  
+        map.graphics.clear();   // 清除图形  
+        drawGeodesic = false;  
+    }  
+
+
+    /**  
+     * 显示坐标的函数  
+     */  
+    function showCoordinates(evt) {  
+        var mp = esri.geometry.webMercatorToGeographic(evt.mapPoint);   // 转换几何，从Web墨卡托单位的地理单位。返回值: Geometry  
+        dojo.byId("coordsInfo").innerHTML = "Lat(纬度):" + mp.y.toFixed(2) + " Lon(经度):" + mp.x.toFixed(2); // 显示的值保留两位小数，使用JS方法中的toFixed(num)方法  
+    }
+    
+    dojo.addOnLoad(init);//初始化加载
+
+    </script>
+
 </head>
 
 <body class="claro">
-  <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width: 100%; height: 100%; margin: 0;">
-    <div id="map" dojotype="dijit.layout.ContentPane" region="center">
-      <div style="position: absolute; right: 20px; top: 10px; z-Index: 999;">
-        <div dojotype="dijit.form.Button" id="drawGraphics" showlabel="true" label="绘制图形" onclick="drawFeedback(true);"></div>
-        <div dojotype="dijit.Tooltip" connectId="drawGraphics">点击地图上拖动来绘制路径</div>
-        <div dojotype="dijit.form.Button" id="clearGraphics" showlabel="true" label="清除图形" onclick="clearGraphics();"></div>
-        <div dojotype="dijit.Tooltip" connectId="clearGraphics">清除所有绘制</div>
-      </div>
-      <div id="coordsInfo"></div>
+    <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width: 100%; height: 100%; margin: 0;">
+        <div id="map" dojotype="dijit.layout.ContentPane" region="center">
+            <div style="position: absolute; right: 20px; top: 10px; z-Index: 999;">
+                <div dojotype="dijit.form.Button" id="drawGraphics" showlabel="true" label="绘制图形" onclick="drawFeedback(true);"></div>
+                <div dojotype="dijit.Tooltip" connectId="drawGraphics">点击地图上拖动来绘制路径</div>
+                <div dojotype="dijit.form.Button" id="clearGraphics" showlabel="true" label="清除图形" onclick="clearGraphics();"></div>
+                <div dojotype="dijit.Tooltip" connectId="clearGraphics">清除所有绘制</div>
+            </div>
+            <div id="coordsInfo"></div>
+        </div>
     </div>
-  </div>
 </body>
 </html>
