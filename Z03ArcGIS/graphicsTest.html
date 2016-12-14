@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>测试ArcGIS API</title>
+    <link rel="stylesheet" href="http://172.16.88.52/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+
+
+    <script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "172.16.88.52" 
+      };
+    </script>
+    <script src="http://172.16.88.52/arcgis_js_api/library/3.16/3.16/init.js"></script>
+
+    <script type="text/javascript">
+      var map;
+      var navToolbar;
+      var identifyTask, identifyParams;
+      var queryTask, query;
+      require([
+                    "dojo/parser",
+                    "esri/map",
+                    "esri/SpatialReference",
+                    "esri/layers/ArcGISTiledMapServiceLayer",
+                    "esri/layers/ArcGISDynamicMapServiceLayer",
+                    "esri/layers/FeatureLayer",
+                    "esri/toolbars/navigation",
+                    "esri/dijit/OverviewMap",
+                    "esri/dijit/Scalebar",
+                    "esri/InfoTemplate",
+                    "esri/symbols/SimpleFillSymbol",
+                    "esri/symbols/SimpleLineSymbol",
+                    "esri/tasks/IdentifyTask",
+                    "esri/tasks/IdentifyParameters",
+                    "esri/tasks/FindTask",
+                    "esri/tasks/query",
+                    "esri/tasks/QueryTask",
+                    "esri/dijit/Popup",
+                    "dojo/_base/array",
+                    "esri/Color",
+                    "dojo/dom-construct",
+                    "dojo/on",
+                    "dojo/dom",
+                    "dojo/domReady!"],
+            function(parser,
+               Map,SpatialReference,
+               ArcGISTiledMapServiceLayer,
+               ArcGISDynamicMapServiceLayer,
+               FeatureLayer,
+               Navigation,
+               OverviewMap,
+               Scalebar,
+               InfoTemplate,
+               SimpleFillSymbol,
+               SimpleLineSymbol,
+               IdentifyTask,
+               IdentifyParameters,
+               FindTask,
+               Query,
+               QueryTask,
+               Popup,
+               arrayUtils,
+               Color,
+               domConstruct,
+               on,
+               dom
+               ){
+                parser.parse();
+                var popup = new Popup({
+                    fillSymbol: new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+                                 new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                                 new Color([255, 0, 0]), 2),
+                                 new Color([255, 255, 0, 0.25]))
+                }, domConstruct.create("div"));
+                map = new Map("mapDiv",{
+                    basemap: "satellite",
+                    center: [-83.275, 42.573],
+                    zoom: 18,
+                    infoWindow: popup
+                });
+                navToolbar = new Navigation(map);
+                var parcelsURL  = "https://sampleserver3.arcgisonline.com/ArcGIS/rest/services/BloomfieldHillsMichigan/Parcels/MapServer";
+                var dylayer = dynamicAddLayer(parcelsURL ,"ArcGISDynamicMapServiceLayer");
+                map.addLayer(dylayer);
+                map.on("mouse-move",showCoordinates);
+                on(dom.byId("Button1"), "click",vavZoomIn);
+                on(dom.byId("Button2"), "click",varZoomOut);
+                on(dom.byId("Button3"), "click",vavPanUp);
+                on(dom.byId("Button4"), "click",vavPandown);
+                on(dom.byId("Button5"), "click",vavPanLeft);
+                on(dom.byId("Button6"), "click",vavPanRight);
+                on(dom.byId("Button7"), "click",vavFullExtent);
+                on(dom.byId("Button8"), "click",vavPan);
+                on(dom.byId("Button9"), "click",overView);
+                //获取图层属性信息， 还可以设置可见图层
+                on(dylayer,"load",getLayerInfo);
+                on(map,"load",mapReady);
+                on(map,"click",executeIdentifyTask );
+                function mapReady(evt){
+                    identifyTask = new IdentifyTask(parcelsURL);
+                    identifyParams = new IdentifyParameters();
+                    identifyParams.tolerance = 3;
+                    identifyParams.returnGeometry = true;
+                    identifyParams.layerIds = [0, 2];
+                    identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_ALL;
+                    identifyParams.width = map.width;
+                    identifyParams.height = map.height;
+                }
+                //执行identifyTask查询操作
+                function executeIdentifyTask(event){
+                    identifyParams.geometry = event.mapPoint;
+                    identifyParams.mapExtent = map.extent;
+                    var deferred = identifyTask
+                            .execute(identifyParams)
+                            .addCallback(function (response) {
+                                return arrayUtils.map(response, function (result) {
+                                    var feature = result.feature;
+                                    var layerName = result.layerName;
+                                    feature.attributes.layerName = layerName;
+                                    if (layerName === 'Tax Parcels') {
+                                        var taxParcelTemplate = new InfoTemplate("",
+                                                "${Postal Address} <br/> Owner of record: ${First Owner Name}");
+                                        feature.setInfoTemplate(taxParcelTemplate);
+                                    }
+                                    else if (layerName === 'Building Footprints') {
+                                        console.log(feature.attributes.PARCELID);
+                                        var buildingFootprintTemplate = new InfoTemplate("",
+                                                "Parcel ID: ${PARCELID}");
+                                        feature.setInfoTemplate(buildingFootprintTemplate);
+                                    }
+                                    return feature;
+                                });
+                            });
+                    map.infoWindow.setFeatures([deferred]);
+                    map.infoWindow.show(event.mapPoint);
+                }
+                //执行findTask操作  params: searchValue  url:"https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StatesCitiesRivers_USA/MapServer/
+                function doFindTask(url,layerID,searchFieldName,searchFieldsValue){
+                    var find = new esri.tasks.FindTask(url);
+                    var params = new esri.tasks.FindParameters();
+                    params.layerIds = [layerID];
+                    params.searchFields = searchFieldName;   //["STATE_NAME","STATE_FIPS"];
+
+                    find.execute(params, showResults);
+                }
+                //findTask执行结果回调函数 通过feature来处理
+                function showResults(results){
+                    /*var result, attribs;
+                    var s = ["<table border=\"1\"><thead><tr style=\"background-color:#ccc;\"><td>State Name</td><td>FIPS</td><td>Population (1990)</td><td>Population (1999)</td></tr></thead><tbody id=\"states\">"];
+                    dojo.forEach(results,function(result){
+                        attribs = result.feature.attributes;
+                        s.push("<tr><td>" + attribs.STATE_NAME + "</td><td>" + attribs.STATE_FIPS + "</td><td>" + attribs.POP1990 + "</td><td>" + attribs.POP1999 + "</td></tr>");
+                    });
+                    s.push("</tbody></table>");
+                    dojo.byId("tbl").innerHTML = s.join("");*/
+                }
+                //执行queryTask
+                function init(){
+                    queryTask = new esri.tasks.QueryTask(url);
+                    query = new esri.tasks.Query();
+                    query.outSpatialReference = {"wkid": 102100};
+                    query.returnGeometry = true;
+                    query.outFields =  outFields;//["FIELD_NAME", "FIELD_KID", "PROD_GAS", "PROD_OIL", "STATUS"];
+
+                    infoTemplate = InfoTemplate("");//new esri.InfoTemplate("${FIELD_NAME}", "Field ID : ${FIELD_KID}<br />Produces Gas : ${PROD_GAS}<br />Produces Oil : ${PROD_OIL}<br />Status : ${STATUS}");
+
+                    symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255,0,0]), 2), new dojo.Color([255,255,0,0.5]));
+                }
+                function doQueryTask(evt){
+                    map.infoWindow.hide();
+                    map.graphics.clear();
+                    query.geometry = evt.mapPoint;
+                    queryTask.execute(query, function(fset) {
+                        if (fset.features.length === 1) {
+                            showFeature(fset.features[0],evt);
+                        } else if (fset.features.length !== 0) {
+                            showFeatureSet(fset,evt);
+                        }
+                    });
+                    function showFeature(feature,evt) {
+                        map.graphics.clear();
+                        feature.setSymbol(symbol);
+                        feature.setInfoTemplate(infoTemplate);
+                        map.graphics.add(feature);
+                    }
+
+                    function showFeatureSet(fset,evt) {
+                        map.graphics.clear();
+                        featureSet = fset;
+                        var numFeatures = featureSet.features.length;
+                        var content = "";
+                        for (var i=0; i<numFeatures; i++) {
+                            var graphic = featureSet.features[i];
+                            content = content + graphic.attributes.FIELD_NAME + " Field (<A href='#' onclick='showFeature(featureSet.features[" + i + "]);'>show</A>)<br/>";
+                        }
+                        map.infoWindow.setContent(content);
+                        map.infoWindow.show(evt.screenPoint);
+                    }
+                }
+
+
+                //添加比例尺
+                var scalebar = new Scalebar({
+                    map: map,
+                    attachTo: "bottom-left"
+                });
+            //动态加载地图
+            function dynamicAddLayer(url,type){
+                var layer;
+                switch(type){
+                    case "ArcGISTiledMapServiceLayer":
+                        layer = new esri.layers.ArcGISTiledMapServiceLayer(url);
+                        break;
+                    case "ArcGISDynamicMapServiceLayer":
+                        layer = new esri.layers.ArcGISDynamicMapServiceLayer(url);
+                        break;
+                    case "FeatureLayer":
+                        layer = new esri.layers.FeatureLayer(url);
+                        break;
+                    case "":
+                        break;
+                }
+                return layer;
+            }
+            //执行放大
+            function vavZoomIn(event){
+                  navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);
+            }
+            //执行缩小
+            function varZoomOut(event) {
+                  navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);
+            }
+            //执行上移动
+            function vavPanUp(event){
+                  map.panUp();
+            }
+            //执行下移动
+            function vavPandown(event){
+                  map.panDown();
+            }
+            //执行全屏
+            function vavFullExtent(event){
+                  navToolbar.zoomToFullExtent();
+            }
+            //执行左移动
+            function vavPanLeft(event){
+                  map.panLeft();
+            }
+            //执行右移动
+            function vavPanRight(event){
+                  map.panRight();
+            }
+            //拖动实现
+            function vavPan(event){
+                  navToolbar.activate(esri.toolbars.Navigation.PAN);
+            }
+            //鹰眼实现
+            function overView(event){
+                  var overviewMap = new esri.dijit.OverviewMap({
+                      map: map,
+                      visible: true
+                  });
+                  overviewMap.startup();
+              }
+            //获取图层信息
+            function getLayerInfo(layer){
+                  var infos = layer.layer.layerInfos;
+                  var html = "";
+                  for(var i = 0; i <= infos.length; i++){
+                      var info = infos[i];
+                      html = html + info.id + "==" + info.name;
+                      //alert(html);
+                  }
+              }
+            //鼠标移动显示坐标 mouse-move事件
+            function showCoordinates(evt) {
+                  var mp = evt.mapPoint;
+                  var sp = evt.screenPoint;
+                  var screenPt = map.toScreen(mp);
+                  var str ="<p style=\"display:block\">"+ "屏幕坐标(x,y):" +"("+screenPt.x + "," + screenPt.y + ")"+"</p>";
+                  dojo.byId("DivBottom").innerHTML = str+"地图坐标(x,y):"+"("+mp.x + ", "+ mp.y+")";
+               }
+
+
+
+            });
+    </script>
+  </head>
+  <body class="esri">
+      <div>
+          <table style="width: 100%;">
+              <tr>
+                  <td>
+                      <input id="Button1" type="button" value="放大" /><input id="Button2" type="button" value="缩小" /><input id="Button3" type="button" value="上移" /><input id="Button4" type="button" value="下移" /><input id="Button5" type="button" value="左移" /><input id="Button6" type="button" value="右移" /><input id="Button7" type="button" value="全屏" /><input id="Button8" type="button" value="拖动" /><input id="Button9" type="button" value="鹰眼" /></td>
+                  <td> </td>
+                  <td> </td>
+              </tr>
+          </table>
+      </div>
+      <div id="mapDiv" style="width:900px; height:600px; border:1px solid #000;"></div>
+      <div id="DivBottom"></div>
+  </body>
+</html>

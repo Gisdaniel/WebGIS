@@ -1,0 +1,258 @@
+<!DOCTYPE>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+  <!--The viewport meta tag is used to improve the presentation and behavior of the samples   
+      on iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+  <title>Create Map</title>
+  <!--<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/dojo/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/css/esri.css" />
+  <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.2"></script>
+  与下面的引用相同，一种是本地，一种是在线  
+    -->
+  <link rel="stylesheet" type="text/css" href="http://172.16.88.52/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+  <link rel="stylesheet" type="text/css" href="http://172.16.88.52/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css"> 
+
+  
+
+  <style type="text/css">
+    html,body {  
+        height: 100%;  
+        width: 100%;  
+        margin: 0;  
+        padding: 0;  
+    }  
+      
+    #map {  
+        padding: 0;  
+    }
+
+    .esriScalebar{  
+        padding: 20px 20px;  
+      }  
+  </style>
+
+  <script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "172.16.88.52" 
+      };
+    </script>
+  <script src="http://172.16.88.52/arcgis_js_api/library/3.16/3.16/init.js"></script>
+
+  <script type="text/javascript">  
+    dojo.require("dijit.layout.BorderContainer");   //类似导入必要包  
+    dojo.require("dijit.layout.ContentPane");  
+    dojo.require("esri.map");  
+  
+    var map;  
+  
+    function init() {  
+        // 设置地图大小范围  
+        var initExtent = new esri.geometry.Extent({  
+            "xmax" : -117.16,   // 右上角X坐标范围  
+            "xmin" : -117.18,   // 左下角X坐标范围  
+            "ymax" : 34.04,     // 右上角Y坐标  
+            "ymin" : 34.03,     // 左下角Y坐标  
+            "spatialReference" : {  // 空间参考  
+                "wkid" : 4326  
+            }  
+        });  
+        map = new esri.Map("map", { // 创建map地图并设置区域  
+            extent: esri.geometry.geographicToWebMercator(initExtent) // 从地理单元，以Web墨卡托单位的转换几何。返回geometry  
+        });  
+  
+        //添加到地图的地形层。 ArcGIS Online的网站服务http://arcgisonline/home/search.html?t=content&f=typekeywords:service      
+        var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");  
+        map.addLayer(basemap);  
+  
+        dojo.connect(map, 'onLoad', function(map) {  
+            //添加行驶路线，图形，地图加载一次  
+            drawRoute();  
+  
+            //当浏览器调整，调整地图的大小  
+            dojo.connect(dijit.byId('map'), 'resize', map, map.resize);  
+            //dojo.connect(map, "onClick", addPoint); // 点击显示坐标信息的窗口提示框  
+        });  
+    }     
+    // 鼠标单击提示框函数  
+    function addPoint(evt) {  
+        map.infoWindow.setTitle("Coordinates(坐标)"); // 标题  
+        map.infoWindow.setContent("</br><b>(经)lat/lon(纬)度：</b>" + evt.mapPoint.y + ", " + evt.mapPoint.x+"</br></br>"+  
+                                "<b>窗口显示位置：</b><font color='red' size='-1'>" + map.getInfoWindowAnchor(evt.screenPoint) + "</font>");   // 内容  
+        map.infoWindow.show(evt.screenPoint,map.getInfoWindowAnchor(evt.screenPoint));  // show(Point point,String placement?)：在指定的位置显示信息窗口  
+    }  
+      
+    // 用户绘制路线的函数  
+    function drawRoute() {  
+        var inputJson = {  
+            "paths" : [ [ [ -13043348, 4034155 ], [ -13043274, 4034040 ] ],  
+                    [ [ -13043274, 4034040 ], [ -13043226, 4034010 ] ],  
+                    [ [ -13043226, 4034010 ], [ -13043201, 4034010 ] ],  
+                    [ [ -13043201, 4034010 ], [ -13043193, 4033972 ] ],  
+                    [ [ -13043193, 4033972 ], [ -13043248, 4033928 ] ],  
+                    [ [ -13043248, 4033928 ], [ -13043275, 4033909 ] ],  
+                    [ [ -13043275, 4033909 ], [ -13043284, 4033890 ] ],  
+                    [ [ -13043284, 4033890 ], [ -13043319, 4033900 ] ],  
+                    [ [ -13043319, 4033900 ], [ -13043341, 4033886 ] ],  
+                    [ [ -13043341, 4033886 ], [ -13043349, 4033870 ] ],  
+                    [ [ -13043349, 4033870 ], [ -13043341, 4033808 ] ],  
+                    [ [ -13043341, 4033808 ], [ -13043171, 4033551 ] ],  
+                    [ [ -13043171, 4033551 ], [ -13043097, 4033605 ] ],  
+                    [ [ -13043097, 4033605 ], [ -13043097, 4033357 ] ],  
+                    [ [ -13043097, 4033357 ], [ -13042661, 4033348 ] ],  
+                    [ [ -13042661, 4033348 ], [ -13042660, 4033162 ] ],  
+                    [ [ -13042660, 4033162 ], [ -13042661, 4032943 ] ],  
+                    [ [ -13042661, 4032943 ], [ -13042501, 4032943 ] ],  
+                    [ [ -13042501, 4032943 ], [ -13042498, 4032620 ] ],  
+                    [ [ -13042498, 4032620 ], [ -13042455, 4032616 ] ],  
+                    [ [ -13042455, 4032616 ], [ -13042446, 4032376 ] ],  
+                    [ [ -13042446, 4032376 ], [ -13042419, 4032299 ] ],  
+                    [ [ -13042419, 4032299 ], [ -13042314, 4032243 ] ],  
+                    [ [ -13042314, 4032243 ], [ -13042250, 4032188 ] ],  
+                    [ [ -13042250, 4032188 ], [ -13042237, 4032151 ] ],  
+                    [ [ -13042237, 4032151 ], [ -13042243, 4032109 ] ],  
+                    [ [ -13042243, 4032109 ], [ -13042243, 4032056 ] ],  
+                    [ [ -13042243, 4032056 ], [ -13042240, 4032025 ] ],  
+                    [ [ -13042240, 4032025 ], [ -13042254, 4032012 ] ],  
+                    [ [ -13042254, 4032012 ], [ -13042284, 4032064 ] ],  
+                    [ [ -13042284, 4032064 ], [ -13042315, 4032095 ] ],  
+                    [ [ -13042315, 4032095 ], [ -13042674, 4032187 ] ],  
+                    [ [ -13042674, 4032187 ], [ -13042704, 4032195 ] ],  
+                    [ [ -13042704, 4032195 ], [ -13042739, 4032257 ] ],  
+                    [ [ -13042739, 4032257 ], [ -13042765, 4032267 ] ],  
+                    [ [ -13042765, 4032267 ], [ -13042834, 4032275 ] ],  
+                    [ [ -13042834, 4032275 ], [ -13042868, 4032295 ] ],  
+                    [ [ -13042868, 4032295 ], [ -13042882, 4032357 ] ],  
+                    [ [ -13042882, 4032357 ], [ -13042883, 4032422 ] ],  
+                    [ [ -13042883, 4032422 ], [ -13042926, 4032452 ] ],  
+                    [ [ -13042926, 4032452 ], [ -13042992, 4032527 ] ],  
+                    [ [ -13042992, 4032527 ], [ -13043059, 4032609 ] ],  
+                    [ [ -13043059, 4032609 ], [ -13043116, 4032593 ] ],  
+                    [ [ -13043116, 4032593 ], [ -13043278, 4032553 ] ],  
+                    [ [ -13043278, 4032553 ], [ -13043324, 4032547 ] ],  
+                    [ [ -13043324, 4032547 ], [ -13043488, 4032597 ] ],  
+                    [ [ -13043488, 4032597 ], [ -13043561, 4032603 ] ],  
+                    [ [ -13043561, 4032603 ], [ -13043773, 4032808 ] ],  
+                    [ [ -13043773, 4032808 ], [ -13043889, 4032917 ] ],  
+                    [ [ -13043889, 4032917 ], [ -13043963, 4032871 ] ],  
+                    [ [ -13043963, 4032871 ], [ -13044030, 4032829 ] ],  
+                    [ [ -13044030, 4032829 ], [ -13044206, 4032840 ] ],  
+                    [ [ -13044206, 4032840 ], [ -13044286, 4032865 ] ],  
+                    [ [ -13044286, 4032865 ], [ -13044391, 4032910 ] ],  
+                    [ [ -13044391, 4032910 ], [ -13044509, 4032958 ] ],  
+                    [ [ -13044509, 4032958 ], [ -13044658, 4033187 ] ],  
+                    [ [ -13044658, 4033187 ], [ -13044265, 4033451 ] ],  
+                    [ [ -13044265, 4033451 ], [ -13044065, 4033580 ] ],  
+                    [ [ -13044065, 4033580 ], [ -13043994, 4033655 ] ],  
+                    [ [ -13043994, 4033655 ], [ -13043946, 4033713 ] ],  
+                    [ [ -13043946, 4033713 ], [ -13044097, 4033954 ] ],  
+                    [ [ -13044097, 4033954 ], [ -13043891, 4034095 ] ],  
+                    [ [ -13043891, 4034095 ], [ -13043482, 4034361 ] ],  
+                    [ [ -13043482, 4034361 ], [ -13043381, 4034203 ] ] ],  
+            "spatialReference" : {  // 空间参考  
+                "wkid" : 102100  
+            }  
+        };  
+  
+        /*  
+         *　esri.symbol.SimpleLineSymbol（线符号）在图形图层上绘制的线性特征。 SimpleLineSymbol可以是实线或短划线和点的预定义的模式。  
+         *  esri.symbol.SimpleLineSymbol()；esri.symbol.SimpleLineSymbol(json);esri.symbol.SimpleLineSymbol(style,color,width)3种构造函数  
+         *  
+         *  esri.symbol.PictureMarkerSymbol（标记符号）在图形图层上绘制点和多点。 PictureMarkerSymbol使用作为标记的图像。  
+         *  esri.symbol.PictureMarkerSymbol(url, width, height) 和  // esri.symbol.PictureMarkerSymbol(json)2种构造函数  
+         */  
+        //设置符号的图形（路由线，启动和停止点和水的位置）  
+        var polylineSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOT, new dojo.Color([ 102, 0, 51 ]), 4);  
+        var startSymbol = new esri.symbol.PictureMarkerSymbol("images/Start.png", 25, 25);   // 起始图标  
+        var stopSymbol = new esri.symbol.PictureMarkerSymbol("images/over.png", 25, 25);    // 结束图标  
+        var infoSymbol = new esri.symbol.PictureMarkerSymbol("images/WZ.png", 30, 30);    // 信息图标  
+  
+        //创建一个图形的行驶路线，使用的输入JSON   
+        var runningRoute = new esri.geometry.Polyline(inputJson);   // (1)polyline(spatialReference),(2)polyline(json)：路径数据，其中每一个路径是一个点的数组  
+        map.graphics.add(new esri.Graphic(runningRoute, polylineSymbol));   //图形被显示在GraphicsLayer。  
+  
+        //添加一个图形的行驶路线，开始和停止坐标使用图标显示位置。  
+        var startPoint = new esri.geometry.Point({  
+            "x" : -13043348,  
+            "y" : 4034155,  
+            " spatialReference" : {  
+                " wkid" : 102100  
+            }  
+        });  
+        var stopPoint = new esri.geometry.Point({  
+            "x" : -13044097,  
+            "y" : 4033954,  
+            " spatialReference" : {  
+                " wkid" : 102100  
+            }  
+        });  
+  
+        map.graphics.add(new esri.Graphic(startPoint, startSymbol));    // 在map中加入图形，此图形中包含坐标和图标信息。  
+        map.graphics.add(new esri.Graphic(stopPoint, stopSymbol));  
+  
+        /*  
+         * InfoTemplate();InfoTemplate(json);InfoTemplate(title,content);InfoTemplate(指定字段显示)4种方式。  
+         */  
+        //添加兴趣点（水，厕所等） - 添加信息模板描述设施。  
+        var infoTemplate = new esri.InfoTemplate("${Name}", "Restroom: ${Facilities}<br />phone: ${Phone}<br />Water: ${Water}</br>");  
+           
+        var park1 = new esri.Graphic({  // 创建第一个地点显示位置  
+            "geometry" : {  // 图形的几何定义  
+                "x" : -13043577,  
+                "y" : 4034040,  
+                "spatialReference" : {  // 空间参考  
+                    "wkid" : 102100  
+                }  
+            },  
+            "attributes" : {    // 与图形相关的字段和字段值的名称值对。  
+                "Name" : "展望公园_Prosped park",  
+                "Facilities" : "Yes",  
+                "Water" : "Yes",  
+                "Phone" : "<image src='images/wz.png' height=130 />"  
+            }  
+        });  
+        park1.setSymbol(infoSymbol);    // 加入图形符号  
+        park1.setInfoTemplate(infoTemplate);    // 加入图形信息窗口，用户单击时，显示该模版  
+        map.graphics.add(park1);    // 在map中加入图形。  
+  
+        var park2 = new esri.Graphic({    
+            "geometry" : {  
+                "x" : -13042885,  
+                "y" : 4033247,  
+                "spatialReference" : {  
+                    "wkid" : 102100  
+                }  
+            },  
+            "attributes" : {  
+                "Name" : "金佰利小学",  
+                "Facilities" : "No",  
+                "Water" : "Yes",  
+                "Phone" : "No"  
+            }  
+        });  
+        park2.setSymbol(infoSymbol);  
+        park2.setInfoTemplate(infoTemplate);  
+        map.graphics.add(park2);  
+          
+        map.infoWindow.resize(430, 200);    // 设置消息框大小  
+    }  
+      
+    dojo.addOnLoad(init);   // 初始化加载  
+</script>  
+
+
+</head>
+<body class="claro">  
+    <!-- 引入了dijit中的小部件;dojotype：dojo容器类型，design：样式，gutters：装订线 -->  
+    <div dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width: 100%; height: 100%; margin: 0;">  
+        <div id="map" dojotype="dijit.layout.ContentPane" region="center" style="overflow: hidden;"></div>  
+    </div>  
+</body>  
+</html>

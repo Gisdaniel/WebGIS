@@ -1,0 +1,149 @@
+<!DOCTYPE>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+  <!--The viewport meta tag is used to improve the presentation and behavior of the samples   
+      on iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+  <title>Create Map</title>
+  <!--<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/dojo/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/css/esri.css" />
+  <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.2"></script>
+  与下面的引用相同，一种是本地，一种是在线  
+    -->
+  <link rel="stylesheet" href="http://172.16.88.52/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+  <style type="text/css">
+    html,body {  
+        height: 100%;  
+        width: 100%;  
+        margin: 0;  
+        padding: 0;  
+    }  
+      
+    #map {  
+        padding: 0;  
+    }
+  </style>
+
+  <script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "172.16.88.52" 
+      };
+    </script>
+  <script src="http://172.16.88.52/arcgis_js_api/library/3.16/3.16/init.js"></script>
+
+  <script type="text/javascript">  
+    // // 类似导入包
+    // dojo.require("esri.map");
+    // dojo.require("esri.geometry.webMercatorUtils");  
+
+    // dojo.require("dijit.layout.BorderContainer");  
+    // dojo.require("dijit.layout.ContentPane");  
+    // dojo.require("esri.map");  
+
+    // var map;  
+    // function init() {  
+    //     // 设置区域范围 最小和最大的X-和Y-坐标的边界框。创建一个新的扩展对象。坐标表示的左下角和右上角的边界框。还需要一个空间参考。  
+    //     // 另外还有2种方式构建：esri.geometry.Extent(xmin, ymin, xmax, ymax, spatialReference) 和 esri.geometry.Extent(json)  
+    //     var initExtent = new esri.geometry.Extent({
+    //         "xmax" : 44.46, // 右上角X坐标  
+    //         "xmin" : -5.54, // 左下角X坐标  
+    //         "ymax" : 58.35, // 右上角y坐标  
+    //         "ymin" : 40.81, // 左下角y坐标  
+    //         "spatialReference": {"wkid":4326}
+    //     });
+
+    //     //创建map地图并设置区域
+    //     map = new esri.Map("map",{
+    //       // 从地理单元，以Web墨卡托单位的转换几何。返回geometry
+    //       extent: esri.geometry.geographicToWebMercator(initExtent)
+    //       //extent: webMercatorUtils.geographicToWebMercator(candidate.location)
+    //     });
+  
+    //     //将地形的服务添加到地图中。
+    //     var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer");  
+    //     map.addLayer(basemap); //在中间添加自定义的服务。这是典型的数据，如人口统计数据，土壤，地质等。  
+          
+    //     // 一个ArcGIS Server REST API 动态地图服务资源ArcGISDynamicMapServiceLayer 该层通常是部分不透明的，因此，base layer 是可见的。     土壤  
+    //     var operationalLayer = new esri.layers.ArcGISDynamicMapServiceLayer(  
+    //             "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer",  
+    //             { "opacity" : 0.5 }  
+    //     );  
+    //     map.addLayer(operationalLayer);     
+          
+    //     // 缓存图层 ArcGISTiledMapServiceLayer  街道  
+    //     var referenceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Reference_Overlay/MapServer");  
+    //     map.addLayer(referenceLayer);  
+        
+    //     dojo.connect(map,'onLoad',function(theMap){ //当浏览器调整，调整地图的大小  
+    //       dojo.connect(dijit.byId('map'), 'resize', map, map.resize);  // 添加resize监听事件
+    //     });
+    // }  
+
+    // dojo.addOnLoad(init);   // 加载事件  
+
+
+      var map;
+      require(["esri/map","esri/geometry/Extent",
+        "esri/layers/ArcGISDynamicMapServiceLayer",
+        "esri/layers/ArcGISTiledMapServiceLayer",
+        "esri/geometry/webMercatorUtils",
+        "dojo/domReady!"
+        ],function(Map,Extent,ArcGISDynamicMapServiceLayer,ArcGISTiledMapServiceLayer,webMercatorUtils
+          ){
+        // 设置区域范围 最小和最大的X-和Y-坐标的边界框。创建一个新的扩展对象。坐标表示的左下角和右上角的边界框。还需要一个空间参考。  
+        // 另外还有2种方式构建：esri.geometry.Extent(xmin, ymin, xmax, ymax, spatialReference) 和 esri.geometry.Extent(json)
+        var initExtent = new Extent({
+            "xmax" : 44.46, // 右上角X坐标  
+            "xmin" : -5.54, // 左下角X坐标  
+            "ymax" : 58.35, // 右上角y坐标  
+            "ymin" : 40.81, // 左下角y坐标  
+            "spatialReference": {"wkid":4326}
+        });
+
+        //创建map地图并设置区域
+        map = new esri.Map("map",{
+          // 从地理单元，以Web墨卡托单位的转换几何。返回geometry
+          //extent: esri.geometry.geographicToWebMercator(initExtent)
+          extent: webMercatorUtils.geographicToWebMercator(initExtent)
+        });
+
+        //将地形的服务添加到地图中。
+        var basemap = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer");  
+        map.addLayer(basemap); //在中间添加自定义的服务。这是典型的数据，如人口统计数据，土壤，地质等。  
+          
+        // 一个ArcGIS Server REST API 动态地图服务资源ArcGISDynamicMapServiceLayer 该层通常是部分不透明的，因此，base layer 是可见的。
+        var operationalLayer = new ArcGISDynamicMapServiceLayer(  
+                "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer",  
+                { "opacity" : 0.5 }  
+        );  
+        map.addLayer(operationalLayer);
+
+        // 缓存图层 ArcGISTiledMapServiceLayer  街道  
+        var referenceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Reference_Overlay/MapServer");  
+        map.addLayer(referenceLayer);  
+
+        // dojo.connect(map,'onLoad',function(theMap){ //当浏览器调整，调整地图的大小  
+        //   dojo.connect(dijit.byId('map'), 'resize', map, map.resize);  // 添加resize监听事件
+        // });
+
+        dojo.connect(map,function(){
+          dojo.connect(dijit.byId('map'),'resize',map,map.resize);
+        });
+
+
+      });
+
+  </script>
+</head>
+<body>
+  <div id="map" style="width:100%; height:100%; border:1px solid #000;"></div>
+  
+</body>
+</html>
