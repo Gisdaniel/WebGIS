@@ -170,9 +170,9 @@
          */  
         //设置符号的图形（路由线，启动和停止点和水的位置）  
         var polylineSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOT, new dojo.Color([ 102, 0, 51 ]), 4);  
-        var startSymbol = new esri.symbol.PictureMarkerSymbol("images/Start.png", 25, 25);   // 起始图标  
-        var stopSymbol = new esri.symbol.PictureMarkerSymbol("images/over.png", 25, 25);    // 结束图标  
-        var infoSymbol = new esri.symbol.PictureMarkerSymbol("images/WZ.png", 30, 30);    // 信息图标  
+        var startSymbol = new esri.symbol.PictureMarkerSymbol("../images/Start.png", 25, 25);   // 起始图标  
+        var stopSymbol = new esri.symbol.PictureMarkerSymbol("../images/over.png", 25, 25);    // 结束图标  
+        var infoSymbol = new esri.symbol.PictureMarkerSymbol("../images/WZ.png", 30, 30);    // 信息图标  
   
         //创建一个图形的行驶路线，使用的输入JSON   
         var runningRoute = new esri.geometry.Polyline(inputJson);   // (1)polyline(spatialReference),(2)polyline(json)：路径数据，其中每一个路径是一个点的数组  
@@ -215,7 +215,7 @@
                 "Name" : "展望公园_Prosped park",  
                 "Facilities" : "Yes",  
                 "Water" : "Yes",  
-                "Phone" : "<image src='images/wz.png' height=130 />"  
+                "Phone" : "<image src='../images/wz.png' height=130 />"  
             }  
         });  
         park1.setSymbol(infoSymbol);    // 加入图形符号  

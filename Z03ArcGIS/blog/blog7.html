@@ -19,7 +19,7 @@
                 //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
                 serverIP : "localhost" 
             };
-        </script>
+    </script>
     <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
 
     <style type="text/css">   
@@ -27,8 +27,19 @@
             color: blue;      
         }  
      </style>  
+
+
       
     <script type="text/javascript">  
+    /***
+    描述：
+
+    此示例显示了如何显示一个地图Dojo Dialog 和TooltipDialog的部件。 TooltipDialog弹出一个窗口，看起来像一个工具提示。在此示例中，TooltipDialog你点击一个链接时，会显示。再次点击该链接，隐藏TooltipDialog。在这个片断中，我们使用dijit.popup.open打开提示对话框。
+    dijit.popup.open({ popup: tooltipDialog, around: node });
+    该示例还显示一个地图在dojo Dialog，在该片段中一个新的地图格的内容创建和设置新的dojo Dialog
+    */
+
+    
       // 导入包，及两个dojo的必要回话组件  
       dojo.require("esri.map");  
       dojo.require("dijit.Dialog");   

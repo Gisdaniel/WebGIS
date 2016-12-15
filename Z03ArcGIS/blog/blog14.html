@@ -1,0 +1,110 @@
+<!DOCTYPE html>  
+<html>  
+  <head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">  
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />  
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">  
+    <meta name="apple-mobile-web-app-capable" content="yes" />  
+    <title>基于缩放级别显示不同的地图服务</title>  
+      
+    <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css">
+      
+    <script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "localhost" 
+      };
+    </script>
+  <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+    <script>  
+      dojo.require("esri.map");     // 导入包  
+  
+      var customLods = [];  
+      var loadCount = 0;      
+      var map, esriImageryLayer, esriStreetLayer;  
+  
+      // 影像图层将是可见的尺度是 0 - 11.    
+      // 在尺度 11 - 15 街道地图层将是可见的。  
+      //   
+      // 这两个图层是可见的尺度是 11。  
+  
+      function init() {  
+        // ESRI imagery from ArcGIS Online, only levels 0 - 11 used here  
+        esriImageryLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer", {  
+          displayLevels : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]    // 刻度级别  
+        });  
+          
+        if (esriImageryLayer.loaded) {  
+          addLods(esriImageryLayer);  
+        } else {  
+          dojo.connect(esriImageryLayer, "onLoad", addLods);  
+        }  
+  
+        // ESRI Street Map service, only levels 11 - 15 used here  
+        esriStreetLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer", {  
+          displayLevels : [11, 12, 13, 14, 15 ],    // 刻度级别  
+          opacity : 0.75    // 透明度  
+        });  
+          
+        // Levels at which this layer will be visible  
+        if (esriStreetLayer.loaded ) {  
+          addLods(esriStreetLayer);  
+        } else {  
+          dojo.connect(esriStreetLayer, "onLoad", addLods);  
+        }  
+      }  
+  
+      // 填写数组中的详细刻度描述  
+      function addLods(lyr) {  
+          // 包含ArcGISTiledMapServiceLayer的tiling方案信息。TileInfo没有构造函数。 数组的定义切片方案的详细程度。  
+        customLods = customLods.concat(lyr.tileInfo.lods);    
+        loadCount++;  
+        if (loadCount === 2) {  
+          initMap();  
+        }  
+      }  
+  
+      //创建地图，并使用自定义级别的详细信息  
+      function initMap() {  
+        map = new esri.Map("map", {   
+          center: [-81.1, 34.93],   // 居中的位置地图.数组,包含经度和纬度(如,[-98，40]) 或 esri.geometry.Point作为输入的位置。  
+          zoom: 9,  // 初始缩放级别的地图。如果没有提供一个值，它会被计算的初始程度的底图。  
+          lods : customLods  
+        });  
+        dojo.connect(map, "onExtentChange", changeScale); // 地图范围改变时候触发事件  
+        map.addLayer(esriImageryLayer);  
+        map.addLayer(esriStreetLayer);  
+      }
+  
+      // 显示当前刻度信息显示  
+      function changeScale(extent, delta, outLevelChange, outLod) {  
+        dojo.byId("scale").innerHTML = "深度: <i>" + outLod.level;  
+        // console.log(outLod.level);  
+        if (outLod.level < 11) {  
+          dojo.byId("visibleLayer").innerHTML = "Layer: <i>影像</i>";  
+        } else if (outLod.level == 11) {  
+          // 两个层同时加载  
+          dojo.byId("visibleLayer").innerHTML = "<i>当前显示两个层</i>";  
+        } else {  
+          dojo.byId("visibleLayer").innerHTML = "Layer: <i>街道</i>";  
+        }  
+      }  
+  
+      dojo.ready(init);   // 初始化加载函数  
+    </script>  
+  </head>  
+  <body>  
+    <div id="map" class="claro" style="position:relative; width:600px; height:400px; border:2px solid #666;">  
+      <span id="scale" style="position:absolute; left:30px; bottom:30px; z-index:100; color:yellow; font-size: 150%;"></span>  
+      <span id="visibleLayer" style="position:absolute; left:30px; bottom:5px; z-index:100; color:yellow; font-size: 150%;"></span>  
+    </div>  
+    <p>  
+    放大切换到街道地图.  
+    </p>  
+  </body>  
+</html>  

@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"  
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+  <!--The viewport meta tag is used to improve the presentation and behavior of the samples  on iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+  <title>地图加载文字</title>
+
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css">
+
+  <!-- css to style the loading text-->
+  <style>  
+      #mapDiv {  
+        border: 1px solid #666;  
+      }  
+  
+      #status {  
+        background-color: black;  
+        color: white;  
+        padding: 3px;  
+        border: solid 1px white;  
+        -moz-border-radius: 5px;  
+        -webkit-border-radius: 5px;  
+        width: 79px;  
+      }  
+        
+    </style>
+  <script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "localhost" 
+      };
+  </script>
+  <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+  <script type="text/javascript">  
+      dojo.require("esri.map");     // 导入包  
+        
+      var map;  
+  
+      function init() {  
+        var initialExtent = new esri.geometry.Extent(   // 范围  
+            11858134,  
+            2685691,   
+            14362823,   
+            3938035,   
+            new esri.SpatialReference({     // 空间参考  
+                wkid:102100  
+            })  
+        );  
+        map = new esri.Map("map",{extent:initialExtent});  
+          
+        dojo.connect(map,"onUpdateStart",function(){  
+          esri.show(dojo.byId("status"));  
+        });  
+        dojo.connect(map,"onUpdateEnd",function(){  
+          esri.hide(dojo.byId("status"));  
+        });  
+  
+  
+        // 一个URL到地图中的地图服务  
+        var tiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");  
+        map.addLayer(tiledMapServiceLayer);  
+  
+  
+         // 非缓存的地图服务的URL  
+        var dynamicMapServiceLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer");  
+        dynamicMapServiceLayer.setOpacity(0.4);  
+        map.addLayer(dynamicMapServiceLayer);  
+  
+      }  
+  
+      dojo.addOnLoad(init);  // 初始化加载  
+    </script>
+</head>
+<body class="claro">
+  <div id="map" style="position:relative; width:1024px; height:512px; border:1px solid #000;">
+    <span id="status" style="position: absolute; z-index: 100; right: 443px; top: 242px;">正在加载...</span>
+  </div>
+</body>
+</html>

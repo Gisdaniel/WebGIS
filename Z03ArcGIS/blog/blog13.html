@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">  
+<html>  
+  <head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>  
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />  
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples on iOS devices-->  
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>  
+    <title>Create Map with Custom ArcGISDynamicMapServiceLayer Layer Definitions</title>  
+     <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css">
+
+    <script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "localhost" 
+      };
+    </script>
+  <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+    <script type="text/javascript">  
+      dojo.require("esri.map");     // 导入包  
+  
+      function init() {  
+          // 空间范围  
+        var startExtent = new esri.geometry.Extent(-103, 36.8, -94, 40.2, new esri.SpatialReference({wkid:4326}) );  
+  
+        var map = new esri.Map("map", {extent:esri.geometry.geographicToWebMercator(startExtent)});  
+        var tiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");  
+        map.addLayer(tiledMapServiceLayer);  
+  
+        //使用ImageParameters设置地图服务层定义和地图服务的可见层，然后再添加到客户端地图。  
+        var imageParameters = new esri.layers.ImageParameters();    // 无带参函数  
+  
+        //layer.setLayerDefinitions采用一个数组。该数组的index索引，对应于该层的id。  
+        //这些数组元素对应的层的ID在远程ArcGISDynamicMapServiceLayer  
+        var layerDefs = [];  
+        layerDefs[5] = "STATE_NAME='Kansas'";   // 使用的sql语句来控制显示，此处为数组赋值，方法解释点击上面链接  
+        layerDefs[4] = "STATE_NAME='Kansas' and POP2007>25000";  
+        layerDefs[3] = "STATE_NAME='Kansas' and POP2007>25000";  
+        imageParameters.layerDefinitions = layerDefs;   // 层数组的表达式
+  
+        // 让层 5,4, 和 3 显示  
+        imageParameters.layerIds = [5,4,3];  
+        imageParameters.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;    // 该选项用于显示或隐藏的层。有效值见常表。  
+        imageParameters.transparent = true;  
+  
+        //construct ArcGISDynamicMapServiceLayer with imageParameters from above  
+        var dynamicMapServiceLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer",  
+             {"imageParameters":imageParameters});  
+  
+        map.addLayer(dynamicMapServiceLayer);  
+      }  
+  
+      dojo.addOnLoad(init);  
+    </script>  
+  </head>  
+  <body class="claro">  
+    <div id="map" style="width:900px; height:600px; border:1px solid #000;"></div>  
+  </body>  
+</html>  

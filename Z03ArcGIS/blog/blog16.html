@@ -1,0 +1,63 @@
+    <!DOCTYPE html>  
+    <html>  
+      <head>  
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">  
+        <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />  
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>  
+        <title>ArcGIS API for JavaScript | Simple Geocoding</title>  
+        <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+
+        <style>  
+          html, body, #map {  
+            height:100%;  
+            width:100%;  
+            margin:0;  
+            padding:0;  
+          }  
+          #search {  
+            display: block;  
+            position: absolute;  
+            z-index: 2;  
+            top: 20px;  
+            left: 74px;  
+          }  
+        </style>  
+         <script type="text/javascript">
+      var dojoConfig = {
+          parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+          //isDebug: false,
+          //locale: 'zh',
+          //serverIP: "192.168.1.135:8080/dmt" 
+          //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+          serverIP : "localhost" 
+      };
+    </script>
+  <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+        <script>  
+            // 导入包  
+          dojo.require("esri.map");  
+          dojo.require("esri.dijit.Geocoder");  
+      
+          var map, geocoder;  
+      
+          dojo.ready(function() {  
+            // 创建地图  
+            map = new esri.Map("map",{  
+              basemap: "gray",  // 指定的地图底图。以下是有效的选项："streets","satellite","hybrid","topo","gray","oceans","national-geographic","osm".    
+              center: [-120.435, 46.159], // 地图居中的经纬度  
+              zoom: 7   //　缩放级别  
+            });  
+      
+            // 创建 geocoder  
+            geocoder = new esri.dijit.Geocoder({      
+              map: map  // 必填项：地图  
+            }, "search");  
+            geocoder.startup(); // 启动  
+          });  
+        </script>  
+      </head>  
+      <body>  
+        <div id="search"></div>  
+        <div id="map"></div>  
+      </body>  
+    </html>  

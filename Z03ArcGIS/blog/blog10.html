@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">  
+  <html>  
+  <head>  
+  <meta http - equiv="Content-Type" content="text/html; charset=utf-8" />  
+  <meta http - equiv="X-UA-Compatible" content="IE=7,IE=9" />  
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />  
+  <title>Resizable Map</title>  
+  <!-- 导入"Claro"主题的样式表 -->  
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css">
+
+<style type="text/css">  
+    <!--Adjust the position of map resize handle a little bit -->  
+   .dojoxResizeHandle {  
+      right: 0px;  
+      bottom: 0px;  
+    }  
+  </style>  
+
+  <script type="text/javascript">
+        var dojoConfig = {
+            parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+            //isDebug: false,
+            //locale: 'zh',
+            //serverIP: "192.168.1.135:8080/dmt" 
+            //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+            serverIP : "localhost" 
+        };
+  </script>
+  <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+     
+  </script>  
+  <script type="text/javascript">  
+  dojo.require("dojo.parser");  // 控制小部件的生成。  
+  
+  // 导入调整大小的模块  
+  dojo.require("dojox.layout.ResizeHandle");  
+  dojo.addOnLoad(pageReady);    // 初始化加载  
+  
+  var map;   
+  
+  function pageReady() {  
+      var initialExtent = new esri.geometry.Extent(  
+    17198,  
+    6008256,  
+    506394,  
+    6497452,  
+    new esri.SpatialReference({  
+        wkid: 102100  
+        })  
+);   
+      map = new esri.Map("mapDiv", {   
+          extent: initialExtent,    // 范围  
+          sliderStyle: "small"  // 滑块样式  
+      });  
+// 创建图层  
+      var tiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer");  
+      map.addLayer(tiledMapServiceLayer);   
+  }  
+  </script>  
+  </head>  
+  
+  <body class="claro">  
+  <!-- Map 元素 -->  
+  <div id="mapDiv" style="position: relative; width: 400px; height: 400px; border:2px solid #575757;">  
+    <!-- ResizeHandle widget: 父节点 mapDiv 是 "position: relative" 其样式属性 - 这是当你需要将浮动元素里面的mapDiv -->  
+    <div data-dojo-type="dojox.layout.ResizeHandle" data-dojo-props="targetId:'mapDiv',activeResize:true,intermediateChanges:true">  
+      <script type="dojo/method" event="onResize">  
+        if (window.map) {  
+          window.map.resize();  
+        }  
+      </script>  
+    </div>  
+  </div>  
+  </body>  
+  </html>  

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">  
+<html>  
+    <head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>  
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />  
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples on iOS devices-->  
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>  
+    <title>OpenStreetMap的默认选项</title>  
+    <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css">
+
+  <script type="text/javascript">
+        var dojoConfig = {
+            parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+            //isDebug: false,
+            //locale: 'zh',
+            //serverIP: "192.168.1.135:8080/dmt" 
+            //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+            serverIP : "localhost" 
+        };
+  </script>
+  <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+    <script type="text/javascript">   
+      // 导入包  
+      dojo.require("esri.map");  
+      dojo.require("esri.layers.osm");  
+      var map, osmLayer;  
+   
+      function init() {  
+        //设置的版权文本在右下角 http://www.openstreetmap.org/copyright  
+        var copyrightText= '© <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> 贡献者, '  
+                    + '<a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>';  
+  
+        dojo.byId('osmCopy').innerHTML = copyrightText;  
+          
+        var extent = new esri.geometry.Extent({  
+            "xmin":-10023722.578230502, // 左下角X坐标  
+            "ymin":3498675.6586681586,  // 左下角Y坐标  
+            "xmax":-9996969.618330726,  // 右上角X坐标  
+            "ymax":3517784.9157394273,  // 右上角Y坐标  
+            "spatialReference":{    // 空间参考  
+                "wkid":102100  
+            }  
+        });  
+        map = new esri.Map(  
+            "map",  // domID  
+            {extent:extent,  // 范围  
+            logo:false  // 不显示logo  
+            }  
+        );  
+          
+        osmLayer = new esri.layers.OpenStreetMapLayer();    // 创建一个OpenStreetMapLayer层  
+        map.addLayer(osmLayer);  
+  
+        var details = "";  
+        details = "loaded(加载): " + osmLayer.loaded + "<br />";  
+        details += "initialExtent(初始范围): " + dojo.toJson(osmLayer.initialExtent.toJson()) + "<br />";  
+        details += "fullExtent(完整范围): " + dojo.toJson(osmLayer.fullExtent.toJson()) + "<br />";  
+        details += "spatialReference(空间参考): " + dojo.toJson(osmLayer.spatialReference.toJson())+ "<br />";  
+        dojo.byId("info").innerHTML = details;  
+      }  
+  
+      dojo.addOnLoad(init);  
+    </script>  
+    </head>  
+  
+    <body class="claro" style="font-size: small; font-family: Arial Unicode MS,Arial,sans-serif;">  
+<div id="map" style="position:relative;width:700px; height:500px; border:1px solid #000;">  
+      <div id="osmCopy" style="position:absolute; color:black;font-weight:bold;right:10px; bottom:10px; z-Index:999;"></div>  
+    </div>  
+<div id="info" style="padding:5px; margin:5px; background-color:#eee;"></div>  
+</body>  
+</html> 

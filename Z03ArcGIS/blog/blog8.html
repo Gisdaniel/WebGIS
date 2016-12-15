@@ -1,0 +1,130 @@
+<!DOCTYPE>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+  <!--The viewport meta tag is used to improve the presentation and behavior of the samples  on iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+  <title>Dynamically Create Map Service Layer List</title>
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css">
+  <link rel="stylesheet" type="text/css" href="http://localhost/arcgis_js_api/library/3.16/3.16/dijit/themes/claro/claro.css">
+
+  <script type="text/javascript">
+        var dojoConfig = {
+            parseOnLoad: true, //使用dojo的组件时，要在加载完成后使用dojo.parser翻译
+            //isDebug: false,
+            //locale: 'zh',
+            //serverIP: "192.168.1.135:8080/dmt" 
+            //其中192.168.1.135:8080是tomcat服务器的地址和端口号,dmt是工程名
+            serverIP : "localhost" 
+        };
+  </script>
+  <script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+  
+  <script type="text/javascript">
+    //类似导入包  
+    dojo.require("esri.map");
+
+    var map;
+    var layer
+    var visible =[];
+
+    function init(){
+      map = esri.Map("map");
+      //创建一个动态服务图层
+      layer = new esri.layers.ArcGISDynamicMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StatesCitiesRivers_USA/MapServer");  
+      if(layer.loaded){//加载图层，并控制显示
+        buildLayerList(layer);
+      }
+      else{
+        dojo.connect(layer,"onLoad",buildLayerList);//服务加载完毕后，获取服务的图层列表
+      }
+    }
+
+    function buildLayerList(layer){
+      var items = dojo.map(
+          layer.layerInfos,
+          function(info,index){
+            if(info.defaultVisibility){
+              visible.push(info.id);
+            }
+            return "<input type='checkbox' class='list_item'" + (info.defaultVisibility ? "checked=checked" :""
+              ) + " ' id='" + info.id +"' onclick='updateLayerVisibility();' /><label for='" + info.id + "'>"
+              + info.name + "</label>";
+          }
+        );
+
+      dojo.byId("layer_list").innerHTML = items.join(' ');
+      layer.setVisibleLayers(visible,true);
+      map.addLayer(layer);
+    }
+
+    function loadLayerList2(layers){//通过自己来写layerInfos的遍历
+        var html=""  
+        var infos=layers.layerInfos;
+        for(var i= 0,length=infos.length;i<length;i++){  
+            var info = infos[i];  
+            //图层默认显示的话就把图层id添加到visible  
+            if(info.defaultVisibility)  
+            {  
+                visible.push(info.id);  
+            }  
+            //输出图层列表的html  
+            html=html+"<div><input id='"+info.id+"' name='layerList' class='listCss' type='checkbox' value='checkbox' onclick='setLayerVisibility()' "+(info.defaultVisibility ? "checked":"")+" />"+info.name+"</div>";  
+        }  
+        dojo.byId("layer_list").innerHTML = html;
+        //设置可视图层  
+        dynamicMapServiceLayer.setVisibleLayers(visible);  
+        //在右边显示图层名列表  
+        map.addLayer(dynamicMapServiceLayer);
+    }  
+
+    function updateLayerVisibility(){
+      var inputs = dojo.query(".list_item");
+
+      visible = [];
+      //遍历每一个文本框
+      dojo.forEach(inputs,function(input){
+        if(input.checked){
+          visible.push(input.id);//填充数据值
+        }
+      });
+
+      // //对checkbox数组进行变量把选中的id添加到visible  
+      // for(var i=0;i<inputs.length;i++)  
+      // {  
+      //     if(inputs[i].checked)  
+      //     {  
+      //         visible.push(inputs[i].id);  
+      //     }  
+      // }  
+
+      // 如果它们中有任何一个不显示的图层将 设置数组为 -1
+      if(visible.length === 0)
+        visible.push(-1);
+
+      layer.setVisibleLayers(visible);
+    }
+
+    
+    dojo.addOnLoad(init);
+
+
+  </script>
+
+
+</head>
+
+
+<body>
+  这个例子中加载一个  ArcGISDynamicMapServiceLayer.
+  <br />
+  它决定了层在地图服务中，并将其显示为复选框，可以用来切换他们的显示。
+  <br />
+  图层列表 :
+  <span id="layer_list"></span>
+  <br />
+  <br />
+  <div id="map" class="claro" style="width:600px; height:400px; border:1px solid #000;"></div>
+</body>
+</html>
