@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">  
+<html>  
+  <head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">  
+    <meta http-equiv="X-UA-Compatible" content="IE=7" />  
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples on iOS devices-->  
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">  
+    <title>Info Window with Chart</title>  
+    <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/js/dojo/dijit/themes/claro/claro.css">  
+    <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/js/esri/css/esri.css">  
+    <style>  
+      html, body {  
+        height: 100%;  
+        width: 100%;  
+        margin: 0;  
+        padding: 0;  
+      }  
+      #map {  
+        padding:0;  
+      }  
+      .chart {  
+        width:200px;  
+        height:200px;  
+        padding:0px !important;  
+      }  
+    </style>  
+    <script>  
+        var dojoConfig = {   
+            parseOnLoad: true   // 解析器  
+        };  
+    </script>  
+    <script src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/"></script>  
+    <script>  
+        // 导入包  
+      dojo.require("dijit.layout.BorderContainer");  
+      dojo.require("dijit.layout.ContentPane");  
+      dojo.require("esri.map");  
+      dojo.require("esri.layers.FeatureLayer");  
+      dojo.require("dojox.charting.Chart2D");  
+      dojo.require("dojox.charting.plot2d.Pie");  
+      dojo.require("dojox.charting.action2d.Highlight");  
+      dojo.require("dojox.charting.action2d.MoveSlice");  
+      dojo.require("dojox.charting.action2d.Tooltip");  
+      dojo.require("dojo.number");  
+      dojo.require("dijit.layout.TabContainer");  
+  
+      var map;  
+      // 其他主题 (Julie,CubanShirts, PrimaryColors, Charged, BlueDusk, Bahamation,Harmony,Shrooms)  
+      var theme = 'Wetland';  
+      dojo.require("dojox.charting.themes." + theme);  
+  
+  
+      function init() {  
+          // 创建地图  
+        map = new esri.Map("map", {  
+          basemap: "streets",
+          center: [-113.405, 43.521],  
+          zoom: 6  
+        });  
+  
+        var template = new esri.InfoTemplate();  
+        // 标志图标是来自http://twitter.com/thefella，在Creative Commons发布  
+        template.setTitle("<b><img src='images/flags/${STATE_ABBR}.png'/>  ${STATE_NAME}</b>");  
+        template.setContent(getWindowContent);  // 内容使用函数来返回  
+  
+        var statesLayer = new esri.layers.FeatureLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/5", {  
+          mode: esri.layers.FeatureLayer.MODE_ONDEMAND, // 选择模式  
+          infoTemplate: template,   // 弹出框  
+          outFields: ["*"]  // 指定的字段显示  
+        });  
+        var symbol = new esri.symbol.SimpleFillSymbol();  
+        statesLayer.setRenderer(new esri.renderer.SimpleRenderer(symbol));  // 渲染器只使用一个符号  
+  
+        map.addLayer(statesLayer);  
+        map.infoWindow.resize(275, 275);    // 弹出框尺寸  
+      }  
+  
+      function getWindowContent(graphic) {  
+        // 一个选项卡容器  
+        var tc = new dijit.layout.TabContainer({  
+          style: "width:100%;height:100%;"  
+        }, dojo.create("div"));  
+  
+        // 显示属性信息  
+        var cp1 = new dijit.layout.ContentPane({  
+          title: "详细信息",  
+          content: "<a target='_blank' href='http://en.wikipedia.org/wiki/" + graphic.attributes.STATE_NAME + "'>维基百科条目</a><br /><br />Median Age: " + graphic.attributes.MED_AGE + "<br />Median Age (Male): " + graphic.attributes.MED_AGE_M + "<br />Median Age (Female): " + graphic.attributes.MED_AGE_F  
+        });  
+  
+        // 男/女比例显示Dojo 饼图  
+        var cp2 = new dijit.layout.ContentPane({  
+          title: "饼图"  
+        });  
+  
+        tc.addChild(cp1);  
+        tc.addChild(cp2);  
+  
+        // 创建图表将显示在第二个选项卡  
+        var c = dojo.create("div", {  
+          id: "demoChart"  
+        }, dojo.create('div'));  
+  
+        var chart = new dojox.charting.Chart2D(c);  
+  
+        dojo.addClass(chart, 'chart');  
+  
+        // 适用图表的颜色主题  
+        chart.setTheme(dojo.getObject("dojox.charting.themes." + theme));  
+  
+        chart.addPlot("default", {  
+          type: "Pie",  
+          radius: 70,   // 半径  
+          htmlLabels: true    
+        });  
+        dojo.connect(tc,'selectChild',function(tabItem){  
+          if(tabItem.title === "饼图"){  
+          chart.resize(180,180);    // 重设尺寸  
+          }  
+        });  
+        // 男女百分比%  
+        var total = graphic.attributes.POP2000;  
+  
+        var male = dojo.number.round(graphic.attributes.MALES / total * 100, 2);  
+        var female = dojo.number.round(graphic.attributes.FEMALES / total * 100, 2);  
+        chart.addSeries("PopulationSplit", [{  
+          y: male,  
+          tooltip: male,  
+          text: 'Male(男)'  
+        }, {  
+          y: female,  
+          tooltip: female,  
+          text: 'Female(女)'  
+        }]);  
+        //当您将鼠标放在一个切片。突出的图表和显示工具提示，  
+        new dojox.charting.action2d.Highlight(chart, "default");  
+        new dojox.charting.action2d.Tooltip(chart, "default");  
+        new dojox.charting.action2d.MoveSlice(chart, "default");  
+  
+        cp2.set('content', chart.node);  
+        return tc.domNode;  
+      }  
+  
+      dojo.ready(init);  
+    </script>  
+  </head>  
+    
+  <body class="claro">  
+    <div id="mainWindow"   
+         data-dojo-type="dijit.layout.BorderContainer"   
+         data-dojo-props="design:'headline', gutters:false"   
+         style="width: 100%; height: 100%; margin: 0;">  
+  
+      <div id="map"   
+           data-dojo-type="dijit.layout.ContentPane"   
+           data-dojo-props="region:'center'"   
+           style="overflow:hidden;">  
+      </div>  
+    </div>  
+  </body>  
+</html>  

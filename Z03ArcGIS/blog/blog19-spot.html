@@ -1,0 +1,118 @@
+<!DOCTYPE html>  
+<html>  
+  <head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">  
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />  
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>  
+    <title>ArcGIS API for JavaScript | Place Finding</title>  
+     <link rel="stylesheet"  href="http://localhost/arcgis_js_api/library/3.16/3.16/esri/css/esri.css"/>
+    <style>  
+      html, body, #map {  
+        height:100%;  
+        width:100%;  
+        margin:0;  
+        padding:0;  
+      }  
+      #search {  
+        display: block;  
+        position: absolute;
+        z-index: 2;  
+        top: 20px;  
+        left: 74px;  
+      }  
+    </style>  
+     <script type="text/javascript">
+   //声明 dojo实例
+        var dojoConfig = {
+            parseOnLoad: true,           
+            locale: 'zh',            
+            serverIP: "localhost"
+        };      
+   </script>
+<script src="http://localhost/arcgis_js_api/library/3.16/3.16/init.js"></script>
+    <script>  
+        // 导入包  
+        dojo.require("esri.map");  
+        dojo.require("esri.dijit.Popup");  
+        dojo.require("esri.dijit.Geocoder");  
+  
+        var map, geocoder;  
+  
+        dojo.ready(function() {  
+            var popup = new esri.dijit.Popup(null, dojo.create("div"));  
+            // 创建地图  
+            map = new esri.Map("map",{  
+            basemap: "topo", // 指定的地图底图。以下是有效选项："streets","satellite","hybrid","topo","gray","oceans","national-geographic","osm".  
+            center: [ -100, 37 ], // long, lat  
+            zoom: 5,  
+            infoWindow: popup  
+        });  
+  
+        // 添加图形层进行地理编码结果  
+        map.addLayer(new esri.layers.GraphicsLayer({  
+            id: "results"  
+        }));
+  
+        // 创建地理编码
+        geocoder = new esri.dijit.Geocoder({   
+            autoNavigate: false, // 如果为true，部件将导航到选定的位置。  
+            maxLocations: 20, // 在结果菜单中显示位置的最大值  
+            map: map,   // 对应map地图，必填项  
+            arcgisGeocoder: {  
+                url: "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer",  
+                name: "Esri World Geocoder",  
+                placeholder: "找到位置",  
+                sourceCountry: "USA" // 限制搜索美国  
+            }  
+        }, "search");  
+        geocoder.startup();  // 开启  
+        geocoder.focus();    // 获得焦点  
+  
+        var symbol = new esri.symbol.PictureMarkerSymbol({  
+            "angle":0,  // 角  
+            "xoffset":0,  // x偏移  
+            "yoffset":10,  // y偏移  
+            "type":"esriPMS",   // 参考上面配置符号API链接  
+            "url":"http://static.arcgis.com/images/Symbols/Shapes/BluePin1LargeB.png",  
+            "contentType":"image/png",    
+            "width":24,  
+            "height":24  
+        });  
+          
+        var template = new esri.InfoTemplate("${name}", "${*}");    //使用通配符方式填充内容  
+          
+        dojo.connect(geocoder, "onFindResults", function(response) {    // 当搜索返回的结果时候触发。  
+            console.log("查找结果: ", response);
+            var l = map.getLayer("results");    // 返回在地图上的一个单独 Layer。  
+            l.clear();  // 清除之前显示  
+            map.infoWindow.hide();  // 隐藏  
+            // 遍历搜索结果  
+            dojo.forEach(response.results, function(r) {  
+                //alert("r.feature.attributes.name: "+r.feature.attributes.name+",r.name: "+r.name);  
+                r.feature.attributes.name = r.name;  
+                r.feature.setSymbol(symbol);    // 添加图标  
+                r.feature.setInfoTemplate(template);    // 添加消息框  
+                l.add(r.feature);     
+            });
+
+            //绑定事件
+        dojo.connect(map.getLayer("results_layer"),"click",function(event){
+            var graphic=event.graphic;
+            alert(graphic.attributes["name"]);
+        })
+
+         alert('test');
+
+        });
+
+        
+
+
+      });  
+    </script>  
+  </head>  
+  <body>  
+    <div id="search"></div>  
+    <div id="map"></div>  
+  </body>  
+</html>     

@@ -11,14 +11,16 @@
     <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/js/dojo/dijit/themes/claro/claro.css">  
     <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/js/esri/css/esri.css">  
     <style>  
-      html, body {  
+      html, body {
         height: 100%; width: 100%; margin: 0; padding: 0;  
       }  
-    </style>  
+    </style>
       
-    <script>var dojoConfig = {   
-        parseOnLoad: true   // 解析加载  
-    };</script>  
+    <script>
+      var dojoConfig = {   
+          parseOnLoad: true   // 解析加载  
+      };
+    </script>  
     <script src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/"></script>  
     <script>  
       // 导入包  
@@ -27,7 +29,7 @@
       dojo.require("dijit.layout.BorderContainer");  
       dojo.require("dijit.layout.ContentPane");  
      
-      var map, toolbar, symbol, geomTask;  
+      var map, toolbar, symbol;  
   
       function init() {  
         map = new esri.Map("map", {  
