@@ -96,10 +96,10 @@
             });
 
             //绑定事件
-        dojo.connect(map.getLayer("results_layer"),"click",function(event){
-            var graphic=event.graphic;
-            alert(graphic.attributes["name"]);
-        })
+            dojo.connect(map.getLayer("results_layer"),"click",function(event){
+                var graphic=event.graphic;
+                alert(graphic.attributes["name"]);
+            });
 
          alert('test');
 

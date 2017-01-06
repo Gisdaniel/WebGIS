@@ -53,6 +53,26 @@
               map: map  // 必填项：地图  
             }, "search");  
             geocoder.startup(); // 启动
+
+
+            dojo.connect(geocoder, "onFindResults", function(response) {    // 当搜索返回的结果时候触发。  
+            console.log("查找结果: ", response);
+            //var l = map.getLayer("results");    // 返回在地图上的一个单独 Layer。  
+            //l.clear();  // 清除之前显示  
+            map.infoWindow.hide();  // 隐藏  
+            // 遍历搜索结果  
+            dojo.forEach(response.results, function(r) {  
+                // //alert("r.feature.attributes.name: "+r.feature.attributes.name+",r.name: "+r.name);  
+                // r.feature.attributes.name = r.name;  
+                // r.feature.setSymbol(symbol);    // 添加图标  
+                // r.feature.setInfoTemplate(template);    // 添加消息框  
+                // l.add(r.feature);     
+            });
+
+        });
+
+
+
           });
         </script>
       </head>  
